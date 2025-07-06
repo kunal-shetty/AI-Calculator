@@ -21,14 +21,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Build Wolfram Alpha API URL with better parameters
+    // Build Wolfram Alpha API URL
     const baseUrl = "https://api.wolframalpha.com/v2/query"
     const params = new URLSearchParams({
       appid: appId,
       input: query,
       format: "plaintext,image",
       output: "json",
-      // Include more pod types to catch basic arithmetic
       includepodid: "Solution,Result,DecimalApproximation,Value,Input,AlternateForm,ExactResult,DecimalForm",
       scantimeout: "15",
       podtimeout: "15",
@@ -123,11 +122,16 @@ function parseWolframResponse(data: any, originalQuery: string) {
   // Extract assumptions
   if (queryResult.assumptions && Array.isArray(queryResult.assumptions)) {
     result.assumptions = queryResult.assumptions
-      .map((assumption: any) => assumption.text || assumption.word)
+      .map((assumption: any) => {
+        if (assumption.template && assumption.values) {
+          return `${assumption.template.replace("${desc1}", assumption.values[0]?.desc || "").replace("${desc2}", assumption.values[1]?.desc || "")}`
+        }
+        return assumption.text || assumption.word
+      })
       .filter(Boolean)
   }
 
-  // Extract solution from pods - check ALL pods for any useful content
+  // Extract solution from pods
   if (queryResult.pods && Array.isArray(queryResult.pods)) {
     console.log("Processing pods...")
 
@@ -139,54 +143,49 @@ function parseWolframResponse(data: any, originalQuery: string) {
       }
     })
 
-    // Priority order for solution pods
-    const solutionPodIds = [
-      "Result",
-      "Solution",
-      "DecimalApproximation",
-      "ExactResult",
-      "DecimalForm",
-      "Value",
-      "AlternateForm",
-    ]
-
-    // First, try to find solution in priority pods
-    for (const podId of solutionPodIds) {
-      const pod = queryResult.pods.find((p: any) => p.id === podId)
-      if (pod && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
-        result.solution = pod.subpods[0].plaintext
-        console.log(`Found solution in ${podId}: ${result.solution}`)
-        break
-      }
+    // Look for the Result pod first (this is the most common for basic math)
+    const resultPod = queryResult.pods.find((pod: any) => pod.id === "Result")
+    if (resultPod && resultPod.subpods && resultPod.subpods[0] && resultPod.subpods[0].plaintext) {
+      result.solution = resultPod.subpods[0].plaintext
+      console.log(`Found solution in Result pod: ${result.solution}`)
     }
 
-    // If no solution found in priority pods, check by title
+    // If no Result pod, try other solution pods
     if (!result.solution) {
-      for (const pod of queryResult.pods) {
-        if (pod.title && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
-          const title = pod.title.toLowerCase()
-          if (title.includes("result") || title.includes("solution") || title.includes("value")) {
-            result.solution = pod.subpods[0].plaintext
-            console.log(`Found solution by title "${pod.title}": ${result.solution}`)
-            break
-          }
+      const solutionPodIds = [
+        "Solution",
+        "DecimalApproximation",
+        "ExactResult",
+        "DecimalForm",
+        "Value",
+        "AlternateForm",
+      ]
+
+      for (const podId of solutionPodIds) {
+        const pod = queryResult.pods.find((p: any) => p.id === podId)
+        if (pod && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
+          result.solution = pod.subpods[0].plaintext
+          console.log(`Found solution in ${podId}: ${result.solution}`)
+          break
         }
       }
     }
 
-    // If still no solution, take the first non-input pod with content
+    // If still no solution, check by title keywords
     if (!result.solution) {
       for (const pod of queryResult.pods) {
-        if (
-          pod.id !== "Input" &&
-          pod.id !== "Interpretation" &&
-          pod.subpods &&
-          pod.subpods[0] &&
-          pod.subpods[0].plaintext
-        ) {
-          result.solution = pod.subpods[0].plaintext
-          console.log(`Using fallback solution from pod "${pod.id}": ${result.solution}`)
-          break
+        if (pod.title && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
+          const title = pod.title.toLowerCase()
+          if (
+            title.includes("result") ||
+            title.includes("solution") ||
+            title.includes("value") ||
+            title.includes("answer")
+          ) {
+            result.solution = pod.subpods[0].plaintext
+            console.log(`Found solution by title "${pod.title}": ${result.solution}`)
+            break
+          }
         }
       }
     }
