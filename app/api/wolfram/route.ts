@@ -11,15 +11,19 @@ export async function POST(request: NextRequest) {
     // Use the provided API key
     const appId = "PAKKY6-WJX9V36LQL"
 
-    // Build Wolfram Alpha API URL - Use HTTPS instead of HTTP
+    // Build Wolfram Alpha API URL
     const baseUrl = "https://api.wolframalpha.com/v2/query"
     const params = new URLSearchParams({
       appid: appId,
       input: query,
       format: "plaintext,image",
       output: "json",
-      includepodid: "Solution,Result,DecimalApproximation,Plot,StepByStepSolution,Input",
+      includepodid: "Solution,Result,DecimalApproximation,Plot,StepByStepSolution,Input,AlternateForm",
       podstate: "Step-by-step solution",
+      scantimeout: "10",
+      podtimeout: "10",
+      formattimeout: "10",
+      parsetimeout: "10",
     })
 
     console.log("Making request to:", `${baseUrl}?${params}`)
@@ -28,42 +32,31 @@ export async function POST(request: NextRequest) {
       method: "GET",
       headers: {
         "User-Agent": "NextJS-Math-Calculator/1.0",
+        Accept: "application/json",
       },
     })
 
     console.log("Response status:", response.status)
-    console.log("Response headers:", Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error("API Error Response:", errorText)
-      throw new Error(`Wolfram Alpha API error: ${response.status} - ${errorText}`)
+      return NextResponse.json(
+        { error: `Wolfram Alpha API error: ${response.status} - ${errorText}` },
+        { status: response.status },
+      )
     }
 
     const responseText = await response.text()
-    console.log("Raw response:", responseText.substring(0, 500))
+    console.log("Raw response length:", responseText.length)
 
-    // Check if response is JSON
+    // Parse JSON response
     let data
     try {
       data = JSON.parse(responseText)
     } catch (parseError) {
       console.error("JSON Parse Error:", parseError)
-      console.error("Response was:", responseText)
-
-      // Return a demo response if JSON parsing fails
-      return NextResponse.json({
-        input: query,
-        solution: getSimpleCalculation(query),
-        steps: [`Calculated: ${query}`, `Result: ${getSimpleCalculation(query)}`],
-        type: "Basic Calculation",
-        images: [],
-        plots: [],
-        assumptions: [],
-        warnings: ["API response parsing failed. Showing basic calculation."],
-        success: true,
-        queryresult: null,
-      })
+      return NextResponse.json({ error: "Failed to parse Wolfram Alpha response" }, { status: 500 })
     }
 
     // Parse Wolfram Alpha response
@@ -72,109 +65,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result)
   } catch (error) {
     console.error("Wolfram Alpha API error:", error)
-
-    // Extract the query from the request for fallback
-    let query = "unknown"
-    try {
-      const body = await request.json()
-      query = body.query || "unknown"
-    } catch {
-      // If we can't parse the request, use a default
-    }
-
-    // Return a more helpful demo response
-    const demoResult = {
-      input: query,
-      solution: getSimpleCalculation(query),
-      steps: [
-        "Step 1: API connection issue detected",
-        `Step 2: Attempting basic calculation for: ${query}`,
-        `Step 3: Result: ${getSimpleCalculation(query)}`,
-      ],
-      type: "Demo Response",
-      images: [],
-      plots: [],
-      assumptions: [],
-      warnings: [
-        "Wolfram Alpha API connection failed.",
-        "Showing basic calculation result.",
-        "Please check your internet connection or try again later.",
-      ],
-      success: true,
-      queryresult: null,
-    }
-    return NextResponse.json(demoResult)
-  }
-}
-
-// Simple calculation function for basic math
-function getSimpleCalculation(query: string): string {
-  try {
-    // Remove common words and clean the query
-    const cleanQuery = query
-      .toLowerCase()
-      .replace(/solve|calculate|what is|find/g, "")
-      .replace(/\s+/g, " ")
-      .trim()
-
-    // Handle basic arithmetic
-    if (cleanQuery.match(/^\d+\s*[+\-*/]\s*\d+$/)) {
-      const result = eval(cleanQuery.replace(/\s/g, ""))
-      return result.toString()
-    }
-
-    // Handle simple equations like "x^2 + 5x + 6 = 0"
-    if (cleanQuery.includes("x^2") && cleanQuery.includes("= 0")) {
-      return "x = -2, x = -3 (quadratic formula solution)"
-    }
-
-    // Handle integration
-    if (cleanQuery.includes("integrate") || cleanQuery.includes("∫")) {
-      if (cleanQuery.includes("sin(x)")) {
-        return "-cos(x) + C"
-      }
-      if (cleanQuery.includes("cos(x)")) {
-        return "sin(x) + C"
-      }
-      if (cleanQuery.includes("x^")) {
-        return "∫x^n dx = x^(n+1)/(n+1) + C"
-      }
-    }
-
-    // Handle derivatives
-    if (cleanQuery.includes("derivative") || cleanQuery.includes("d/dx")) {
-      if (cleanQuery.includes("x^3")) {
-        return "3x^2"
-      }
-      if (cleanQuery.includes("sin(x)")) {
-        return "cos(x)"
-      }
-      if (cleanQuery.includes("cos(x)")) {
-        return "-sin(x)"
-      }
-    }
-
-    // Default responses for common queries
-    const responses: { [key: string]: string } = {
-      "1+1": "2",
-      "2+2": "4",
-      pi: "3.14159265359...",
-      e: "2.71828182846...",
-      "sqrt(4)": "2",
-      "sqrt(9)": "3",
-      "2^3": "8",
-      "3^2": "9",
-    }
-
-    for (const [pattern, result] of Object.entries(responses)) {
-      if (cleanQuery.includes(pattern)) {
-        return result
-      }
-    }
-
-    return "Unable to calculate (demo mode)"
-  } catch (error) {
-    return "Calculation error (demo mode)"
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to process request" },
+      { status: 500 },
+    )
   }
 }
 
@@ -193,18 +87,19 @@ function parseWolframResponse(data: any, originalQuery: string) {
   }
 
   if (!data.queryresult) {
-    result.solution = "Unable to process query"
-    result.warnings.push("Invalid response from Wolfram Alpha")
+    result.solution = "No response from Wolfram Alpha"
+    result.warnings.push("Invalid response structure")
     return result
   }
 
   const queryResult = data.queryresult
 
   if (!queryResult.success) {
-    result.solution = getSimpleCalculation(originalQuery)
-    result.warnings.push("Wolfram Alpha could not interpret the query")
-    result.warnings.push("Showing basic calculation result")
-    result.success = true
+    result.solution = "Wolfram Alpha could not interpret the query"
+    result.warnings.push("Query not understood by Wolfram Alpha")
+    if (queryResult.tips) {
+      result.warnings.push(`Tip: ${queryResult.tips}`)
+    }
     return result
   }
 
@@ -263,10 +158,10 @@ function parseWolframResponse(data: any, originalQuery: string) {
     }
   }
 
-  // If still no solution, use basic calculation
+  // If still no solution, indicate no result
   if (!result.solution) {
-    result.solution = getSimpleCalculation(originalQuery)
-    result.warnings.push("Using basic calculation as fallback")
+    result.solution = "No solution found"
+    result.warnings.push("Wolfram Alpha did not return a solution for this query")
   }
 
   // Determine problem type

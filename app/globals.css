@@ -57,121 +57,113 @@
   body {
     @apply bg-background text-foreground;
     font-family: Inter, system-ui, -apple-system, sans-serif;
-    color: hsl(var(--foreground)) !important;
   }
+}
 
-  /* Ensure all text is visible with proper contrast */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+/* Clean, reliable text styling */
+@layer components {
+  .text-readable {
     color: rgb(15, 23, 42) !important;
   }
 
-  p,
-  span,
-  div,
-  label {
-    color: rgb(51, 65, 85) !important;
+  .text-readable-muted {
+    color: rgb(71, 85, 105) !important;
   }
 
-  .text-muted-foreground {
-    color: rgb(100, 116, 139) !important;
-  }
-
-  .text-primary {
+  .text-readable-primary {
     color: rgb(59, 130, 246) !important;
   }
 
-  /* Fix badge text visibility */
-  .badge-visible {
+  .bg-card-clean {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .solution-display {
+    background: linear-gradient(135deg, rgb(240, 253, 244) 0%, rgb(220, 252, 231) 100%);
+    color: rgb(5, 46, 22) !important;
+    border: 2px solid rgb(34, 197, 94);
+  }
+
+  .solution-mono {
+    font-family: "JetBrains Mono", "Fira Code", "Courier New", monospace;
+    color: rgb(5, 46, 22) !important;
+    font-weight: 700;
+  }
+
+  .step-item {
+    background: linear-gradient(135deg, rgb(239, 246, 255) 0%, rgb(219, 234, 254) 100%);
+    color: rgb(30, 58, 138) !important;
+    border-left: 4px solid rgb(59, 130, 246);
+  }
+
+  .input-clean {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    color: rgb(15, 23, 42) !important;
+    border: 2px solid rgb(203, 213, 225);
+  }
+
+  .input-clean:focus {
+    border-color: rgb(59, 130, 246) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  }
+
+  .input-clean::placeholder {
+    color: rgb(148, 163, 184) !important;
+  }
+
+  .btn-clean {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(15, 23, 42) !important;
+    border: 1px solid rgb(203, 213, 225) !important;
+  }
+
+  .btn-clean:hover {
+    background-color: rgb(248, 250, 252) !important;
+    border-color: rgb(148, 163, 184) !important;
+  }
+
+  .badge-clean {
     background-color: rgb(241, 245, 249) !important;
     color: rgb(15, 23, 42) !important;
     border: 1px solid rgb(203, 213, 225) !important;
   }
 
-  .badge-visible:hover {
+  .badge-clean:hover {
     background-color: rgb(219, 234, 254) !important;
     color: rgb(30, 64, 175) !important;
   }
-
-  /* Card text fixes */
-  .card-text {
-    color: rgb(15, 23, 42) !important;
-  }
-
-  .card-muted {
-    color: rgb(100, 116, 139) !important;
-  }
-
-  /* Button text fixes */
-  .btn-text {
-    color: rgb(15, 23, 42) !important;
-  }
-
-  /* Input text fixes */
-  input,
-  textarea {
-    color: rgb(15, 23, 42) !important;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: rgb(148, 163, 184) !important;
-  }
-
-  /* Tab text fixes */
-  .tab-text {
-    color: rgb(71, 85, 105) !important;
-  }
-
-  .tab-text[data-state="active"] {
-    color: white !important;
-  }
-
-  /* Solution result text */
-  .solution-text {
-    color: rgb(15, 23, 42) !important;
-    font-weight: 600;
-  }
-
-  .solution-mono {
-    color: rgb(30, 64, 175) !important;
-    font-family: "Courier New", monospace;
-    font-weight: 700;
-  }
 }
 
-/* Additional utility classes */
-@layer utilities {
-  .text-visible {
-    color: rgb(15, 23, 42) !important;
-  }
+/* Dark mode overrides */
+.dark .text-readable {
+  color: rgb(241, 245, 249) !important;
+}
 
-  .text-visible-muted {
-    color: rgb(100, 116, 139) !important;
-  }
+.dark .text-readable-muted {
+  color: rgb(148, 163, 184) !important;
+}
 
-  .text-visible-primary {
-    color: rgb(59, 130, 246) !important;
-  }
+.dark .bg-card-clean {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+  border-color: rgba(71, 85, 105, 0.3);
+}
 
-  .bg-visible-card {
-    background-color: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(8px);
-  }
+.dark .input-clean {
+  background-color: rgba(30, 41, 59, 0.9) !important;
+  color: rgb(241, 245, 249) !important;
+  border-color: rgb(71, 85, 105);
+}
 
-  .force-visible-text {
-    color: hsl(222.2 84% 4.9%) !important;
-  }
+.dark .btn-clean {
+  background-color: rgb(30, 41, 59) !important;
+  color: rgb(241, 245, 249) !important;
+  border-color: rgb(71, 85, 105) !important;
+}
 
-  .force-visible-muted {
-    color: hsl(215.4 16.3% 46.9%) !important;
-  }
-
-  .force-visible-primary {
-    color: hsl(221.2 83.2% 53.3%) !important;
-  }
+.dark .badge-clean {
+  background-color: rgb(51, 65, 85) !important;
+  color: rgb(241, 245, 249) !important;
+  border-color: rgb(71, 85, 105) !important;
 }
