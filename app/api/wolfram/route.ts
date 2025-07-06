@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { query, format = "detailed", includesteps = false } = await request.json()
+    const { query } = await request.json()
 
     if (!query) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 })
@@ -10,7 +10,24 @@ export async function POST(request: NextRequest) {
 
     const appId = process.env.WOLFRAM_APP_ID
     if (!appId) {
-      return NextResponse.json({ error: "Wolfram Alpha API key not configured" }, { status: 500 })
+      // Return a demo response when API key is not configured
+      const demoResult = {
+        input: query,
+        solution: "Demo: x = -2, x = -3 (Configure Wolfram Alpha API for real solutions)",
+        steps: [
+          "Step 1: This is a demo response",
+          "Step 2: Configure WOLFRAM_APP_ID environment variable",
+          "Step 3: Get your API key from Wolfram Alpha Developer Portal",
+        ],
+        type: "Demo Response",
+        images: [],
+        plots: [],
+        assumptions: [],
+        warnings: ["This is a demo response. Please configure Wolfram Alpha API key for real calculations."],
+        success: true,
+        queryresult: null,
+      }
+      return NextResponse.json(demoResult)
     }
 
     // Build Wolfram Alpha API URL
@@ -20,12 +37,9 @@ export async function POST(request: NextRequest) {
       input: query,
       format: "plaintext,image",
       output: "json",
-      includepodid: "Solution,Result,DecimalApproximation,Plot",
+      includepodid: "Solution,Result,DecimalApproximation,Plot,StepByStepSolution",
+      podstate: "Step-by-step solution",
     })
-
-    if (includesteps) {
-      params.append("podstate", "Step-by-step solution")
-    }
 
     const response = await fetch(`${baseUrl}?${params}`)
 
@@ -36,7 +50,7 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
 
     // Parse Wolfram Alpha response
-    const result = parseWolframResponse(data, query, format)
+    const result = parseWolframResponse(data, query)
 
     return NextResponse.json(result)
   } catch (error) {
@@ -45,7 +59,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function parseWolframResponse(data: any, originalQuery: string, format: string) {
+function parseWolframResponse(data: any, originalQuery: string) {
   const result = {
     input: originalQuery,
     solution: "",
@@ -92,10 +106,12 @@ function parseWolframResponse(data: any, originalQuery: string, format: string) 
       }
 
       // Step-by-step solutions
-      if (pod.title && pod.title.includes("step") && pod.subpods) {
-        for (const subpod of pod.subpods) {
-          if (subpod.plaintext) {
-            result.steps.push(subpod.plaintext)
+      if ((pod.title && pod.title.toLowerCase().includes("step")) || pod.id === "StepByStepSolution") {
+        if (pod.subpods) {
+          for (const subpod of pod.subpods) {
+            if (subpod.plaintext) {
+              result.steps.push(subpod.plaintext)
+            }
           }
         }
       }
@@ -104,7 +120,7 @@ function parseWolframResponse(data: any, originalQuery: string, format: string) 
       if (pod.subpods) {
         for (const subpod of pod.subpods) {
           if (subpod.img && subpod.img.src) {
-            if (pod.id === "Plot" || pod.title?.includes("plot")) {
+            if (pod.id === "Plot" || pod.title?.toLowerCase().includes("plot")) {
               result.plots.push(subpod.img.src)
             } else {
               result.images.push(subpod.img.src)

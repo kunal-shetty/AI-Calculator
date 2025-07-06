@@ -17,7 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Loader2,
@@ -165,7 +164,6 @@ export default function Home() {
   const [inputMethod, setInputMethod] = useState<"text" | "builder" | "upload">("text")
   const [showHistory, setShowHistory] = useState(false)
   const [showColorCustomizer, setShowColorCustomizer] = useState(false)
-  const [outputFormat, setOutputFormat] = useState<"simple" | "detailed" | "step-by-step">("detailed")
   const [currentTheme, setCurrentTheme] = useState<ColorTheme>(defaultThemes[0])
 
   // Load saved preferences
@@ -249,8 +247,6 @@ export default function Home() {
         },
         body: JSON.stringify({
           query: input,
-          format: outputFormat,
-          includesteps: outputFormat === "step-by-step",
         }),
       })
 
@@ -395,26 +391,12 @@ export default function Home() {
             {/* Input Methods */}
             <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5 text-primary" />
-                    Enter Your Math Problem
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <Select value={outputFormat} onValueChange={(value: any) => setOutputFormat(value)}>
-                      <SelectTrigger className="w-40 border-primary/20">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="simple">Simple</SelectItem>
-                        <SelectItem value="detailed">Detailed</SelectItem>
-                        <SelectItem value="step-by-step">Step-by-step</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                  Enter Your Math Problem
                 </CardTitle>
                 <CardDescription className="text-muted-foreground/80">
-                  Choose your preferred input method and output format
+                  Choose your preferred input method to solve mathematical problems
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-6">
@@ -551,7 +533,7 @@ export default function Home() {
                       <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
                       <div className="absolute inset-0 h-12 w-12 mx-auto rounded-full border-2 border-primary/20"></div>
                     </div>
-                    <p className="text-lg font-medium text-muted-foreground">Processing with Wolfram Alpha...</p>
+                    <p className="text-lg font-medium text-foreground">Processing with Wolfram Alpha...</p>
                     <p className="text-sm text-muted-foreground mt-2">This may take a few seconds</p>
                   </div>
                 </CardContent>
@@ -567,7 +549,7 @@ export default function Home() {
                       <div className="p-2 bg-primary/20 rounded-lg">
                         <Calculator className="h-5 w-5 text-primary" />
                       </div>
-                      Solution
+                      <span className="text-foreground">Solution</span>
                       <Badge variant="outline" className="border-primary/30 text-primary">
                         {result.type}
                       </Badge>
@@ -613,7 +595,7 @@ export default function Home() {
                 <CardContent className="space-y-6 p-6">
                   <div>
                     <h4 className="font-semibold text-sm text-muted-foreground mb-3">Problem:</h4>
-                    <div className="p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg font-mono text-sm border border-primary/10">
+                    <div className="p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg font-mono text-sm border border-primary/10 text-foreground">
                       {result.input}
                     </div>
                   </div>
@@ -627,7 +609,7 @@ export default function Home() {
                         {result.assumptions.map((assumption, index) => (
                           <div
                             key={index}
-                            className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-sm border border-blue-200/50 dark:border-blue-800/50"
+                            className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-sm border border-blue-200/50 dark:border-blue-800/50 text-foreground"
                           >
                             {assumption}
                           </div>
@@ -648,7 +630,7 @@ export default function Home() {
                             <span className="font-semibold text-primary mr-2 bg-primary/10 px-2 py-1 rounded">
                               Step {index + 1}
                             </span>
-                            <span className="ml-2">{step}</span>
+                            <span className="ml-2 text-foreground">{step}</span>
                           </div>
                         ))}
                       </div>
@@ -683,7 +665,7 @@ export default function Home() {
                     <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
                       <AlertCircle className="h-4 w-4 text-amber-600" />
                       <AlertDescription>
-                        <div className="space-y-1">
+                        <div className="space-y-1 text-foreground">
                           {result.warnings.map((warning, index) => (
                             <div key={index}>{warning}</div>
                           ))}
@@ -703,7 +685,7 @@ export default function Home() {
               <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Settings className="h-5 w-5 text-primary" />
-                  Quick Examples
+                  <span className="text-foreground">Quick Examples</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
@@ -737,7 +719,7 @@ export default function Home() {
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <History className="h-5 w-5 text-primary" />
-                    Recent History
+                    <span className="text-foreground">Recent History</span>
                   </span>
                   <Button
                     variant="ghost"

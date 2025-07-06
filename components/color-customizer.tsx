@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -34,9 +33,9 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
     secondary: "210 40% 96%",
     accent: "210 40% 96%",
     background: "0 0% 100%",
-    foreground: "222.2 84% 4.9%",
-    mutedForeground: "215.4 16.3% 46.9%",
-    cardForeground: "222.2 84% 4.9%",
+    foreground: "0 0% 0%",
+    mutedForeground: "0 0% 45%",
+    cardForeground: "0 0% 0%",
   })
 
   const handleCustomThemeChange = (field: keyof ColorTheme, value: string) => {
@@ -59,12 +58,21 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
   ]
 
   const textColorPresets = [
-    { name: "Dark Gray", value: "222.2 84% 4.9%" },
-    { name: "Light Gray", value: "210 40% 98%" },
     { name: "Black", value: "0 0% 0%" },
+    { name: "Dark Gray", value: "0 0% 20%" },
+    { name: "Medium Gray", value: "0 0% 45%" },
+    { name: "Light Gray", value: "0 0% 70%" },
     { name: "White", value: "0 0% 100%" },
-    { name: "Muted Dark", value: "215.4 16.3% 46.9%" },
-    { name: "Muted Light", value: "215 20.2% 65.1%" },
+    { name: "Navy", value: "222.2 84% 4.9%" },
+  ]
+
+  const backgroundPresets = [
+    { name: "White", value: "0 0% 100%" },
+    { name: "Light Gray", value: "0 0% 98%" },
+    { name: "Off White", value: "60 9% 98%" },
+    { name: "Dark", value: "222.2 84% 4.9%" },
+    { name: "Dark Gray", value: "240 10% 3.9%" },
+    { name: "Black", value: "0 0% 0%" },
   ]
 
   return (
@@ -152,13 +160,22 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                   </div>
                 </div>
 
-                {/* Color Settings */}
+                {/* Background Settings */}
                 <div>
                   <h4 className="font-medium mb-3 flex items-center gap-2">
                     <Palette className="h-4 w-4" />
-                    Background & Accent Colors
+                    Background Colors
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="background-color">Background Color (HSL)</Label>
+                      <Input
+                        id="background-color"
+                        value={customTheme.background}
+                        onChange={(e) => handleCustomThemeChange("background", e.target.value)}
+                        placeholder="0 0% 100%"
+                      />
+                    </div>
                     <div>
                       <Label htmlFor="primary-color">Primary Color (HSL)</Label>
                       <Input
@@ -186,15 +203,6 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                         placeholder="210 40% 96%"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="background-color">Background Color (HSL)</Label>
-                      <Input
-                        id="background-color"
-                        value={customTheme.background}
-                        onChange={(e) => handleCustomThemeChange("background", e.target.value)}
-                        placeholder="0 0% 100%"
-                      />
-                    </div>
                   </div>
                 </div>
 
@@ -211,7 +219,7 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                         id="foreground-color"
                         value={customTheme.foreground}
                         onChange={(e) => handleCustomThemeChange("foreground", e.target.value)}
-                        placeholder="222.2 84% 4.9%"
+                        placeholder="0 0% 0%"
                       />
                     </div>
                     <div>
@@ -220,7 +228,7 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                         id="muted-foreground-color"
                         value={customTheme.mutedForeground}
                         onChange={(e) => handleCustomThemeChange("mutedForeground", e.target.value)}
-                        placeholder="215.4 16.3% 46.9%"
+                        placeholder="0 0% 45%"
                       />
                     </div>
                     <div>
@@ -229,14 +237,14 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                         id="card-foreground-color"
                         value={customTheme.cardForeground}
                         onChange={(e) => handleCustomThemeChange("cardForeground", e.target.value)}
-                        placeholder="222.2 84% 4.9%"
+                        placeholder="0 0% 0%"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Quick Color Presets */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Quick Presets */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Quick Primary Colors</Label>
                     <div className="flex flex-wrap gap-2">
@@ -267,6 +275,27 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                           variant="outline"
                           size="sm"
                           onClick={() => handleCustomThemeChange("foreground", color.value)}
+                          className="flex items-center gap-2"
+                        >
+                          <div
+                            className="w-4 h-4 rounded-full border"
+                            style={{ backgroundColor: `hsl(${color.value})` }}
+                          />
+                          {color.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Quick Backgrounds</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {backgroundPresets.map((color, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCustomThemeChange("background", color.value)}
                           className="flex items-center gap-2"
                         >
                           <div
@@ -310,25 +339,24 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                       </div>
 
                       <h3 className="text-lg font-semibold" style={{ color: `hsl(${customTheme.foreground})` }}>
-                        Sample Heading
+                        Sample Heading Text
                       </h3>
 
                       <p className="text-sm" style={{ color: `hsl(${customTheme.mutedForeground})` }}>
                         This is how your muted text will look in the interface
                       </p>
 
-                      <Badge
-                        className="inline-block"
+                      <div
+                        className="inline-block px-3 py-1 rounded text-white text-sm font-medium"
                         style={{
                           backgroundColor: `hsl(${customTheme.primary})`,
-                          color: "white",
                         }}
                       >
                         Sample Badge
-                      </Badge>
+                      </div>
 
                       <div
-                        className="p-3 rounded border"
+                        className="p-3 rounded border mt-3"
                         style={{
                           backgroundColor: `hsl(${customTheme.secondary})`,
                           color: `hsl(${customTheme.cardForeground})`,
@@ -354,9 +382,9 @@ export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }
                         secondary: "210 40% 96%",
                         accent: "210 40% 96%",
                         background: "0 0% 100%",
-                        foreground: "222.2 84% 4.9%",
-                        mutedForeground: "215.4 16.3% 46.9%",
-                        cardForeground: "222.2 84% 4.9%",
+                        foreground: "0 0% 0%",
+                        mutedForeground: "0 0% 45%",
+                        cardForeground: "0 0% 0%",
                       })
                     }
                   >
