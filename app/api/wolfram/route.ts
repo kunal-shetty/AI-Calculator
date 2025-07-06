@@ -1,245 +1,144 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const WOLFRAM_APP_ID = process.env.WOLFRAM_APP_ID
-
-interface WolframResponse {
-  queryresult: {
-    success: boolean
-    error?: boolean
-    numpods: number
-    datatypes?: string
-    timedout?: string
-    timedoutpods?: string
-    timing?: number
-    parsetiming?: number
-    parsetimedout?: boolean
-    recalculate?: string
-    id?: string
-    host?: string
-    server?: string
-    related?: string
-    version?: string
-    inputstring?: string
-    pods?: Array<{
-      title: string
-      scanner: string
-      id: string
-      position: number
-      error?: boolean
-      numsubpods: number
-      subpods: Array<{
-        title: string
-        img?: {
-          src: string
-          alt: string
-          title: string
-          width: number
-          height: number
-        }
-        plaintext?: string
-        mathml?: string
-      }>
-      states?: Array<{
-        name: string
-        input: string
-      }>
-      infos?: Array<{
-        text: string
-        img?: {
-          src: string
-          alt: string
-          title: string
-          width: number
-          height: number
-        }
-      }>
-    }>
-    assumptions?: Array<{
-      type: string
-      word: string
-      template: string
-      count: number
-      values: Array<{
-        name: string
-        desc: string
-        input: string
-      }>
-    }>
-    sources?: Array<{
-      url: string
-      text: string
-    }>
-    warnings?: Array<{
-      text: string
-      word: string
-      suggestion: string
-      delimiters: string
-    }>
-  }
-}
-
-function parseWolframResponse(data: WolframResponse, query: string, format: string) {
-  const queryResult = data.queryresult
-
-  if (!queryResult.success) {
-    throw new Error("Wolfram Alpha could not process this query")
-  }
-
-  const pods = queryResult.pods || []
-  const inputPod = pods.find((pod) => pod.id === "Input" || pod.title.toLowerCase().includes("input"))
-  const solutionPods = pods.filter(
-    (pod) =>
-      pod.title.toLowerCase().includes("result") ||
-      pod.title.toLowerCase().includes("solution") ||
-      pod.title.toLowerCase().includes("answer") ||
-      pod.id === "Result",
-  )
-
-  const stepsPods = pods.filter(
-    (pod) =>
-      pod.title.toLowerCase().includes("step") ||
-      pod.title.toLowerCase().includes("solution") ||
-      pod.scanner === "Solve",
-  )
-
-  const plotPods = pods.filter(
-    (pod) =>
-      pod.title.toLowerCase().includes("plot") || pod.title.toLowerCase().includes("graph") || pod.scanner === "Plot",
-  )
-
-  // Extract main solution
-  let solution = "No solution found"
-  const images: string[] = []
-  const steps: string[] = []
-
-  // Get the primary result
-  if (solutionPods.length > 0) {
-    const mainResult = solutionPods[0]
-    if (mainResult.subpods && mainResult.subpods.length > 0) {
-      solution = mainResult.subpods[0].plaintext || mainResult.subpods[0].img?.alt || "See image result"
-      if (mainResult.subpods[0].img) {
-        images.push(mainResult.subpods[0].img.src)
-      }
-    }
-  }
-
-  // Extract step-by-step solutions
-  if (format === "step-by-step" && stepsPods.length > 0) {
-    stepsPods.forEach((pod) => {
-      if (pod.subpods) {
-        pod.subpods.forEach((subpod) => {
-          if (subpod.plaintext && subpod.plaintext.trim()) {
-            steps.push(subpod.plaintext)
-          }
-        })
-      }
-    })
-  }
-
-  // Extract plots and images
-  plotPods.forEach((pod) => {
-    if (pod.subpods) {
-      pod.subpods.forEach((subpod) => {
-        if (subpod.img) {
-          images.push(subpod.img.src)
-        }
-      })
-    }
-  })
-
-  // Extract all other relevant images
-  pods.forEach((pod) => {
-    if (pod.subpods && !pod.title.toLowerCase().includes("input")) {
-      pod.subpods.forEach((subpod) => {
-        if (subpod.img && !images.includes(subpod.img.src)) {
-          images.push(subpod.img.src)
-        }
-      })
-    }
-  })
-
-  // Determine problem type
-  let type = "Mathematical Problem"
-  if (query.toLowerCase().includes("solve")) type = "Equation Solving"
-  else if (query.toLowerCase().includes("integrate")) type = "Integration"
-  else if (query.toLowerCase().includes("derivative")) type = "Differentiation"
-  else if (query.toLowerCase().includes("limit")) type = "Limits"
-  else if (query.toLowerCase().includes("plot")) type = "Graphing"
-  else if (query.toLowerCase().includes("factor")) type = "Factoring"
-  else if (query.toLowerCase().includes("matrix")) type = "Linear Algebra"
-
-  // Extract assumptions
-  const assumptions = queryResult.assumptions?.map((assumption) => `${assumption.word}: ${assumption.template}`) || []
-
-  // Extract warnings
-  const warnings = queryResult.warnings?.map((warning) => warning.text) || []
-
-  return {
-    input: query,
-    solution,
-    steps: steps.length > 0 ? steps : undefined,
-    type,
-    images: images.length > 0 ? images : undefined,
-    assumptions: assumptions.length > 0 ? assumptions : undefined,
-    warnings: warnings.length > 0 ? warnings : undefined,
-    success: true,
-    queryresult: queryResult,
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
-    if (!WOLFRAM_APP_ID) {
+    const { query, format = "detailed", includesteps = false } = await request.json()
+
+    if (!query) {
+      return NextResponse.json({ error: "Query is required" }, { status: 400 })
+    }
+
+    const appId = process.env.WOLFRAM_APP_ID
+    if (!appId) {
       return NextResponse.json({ error: "Wolfram Alpha API key not configured" }, { status: 500 })
     }
 
-    const { query, format = "detailed", includesteps = false } = await request.json()
-
-    if (!query || typeof query !== "string") {
-      return NextResponse.json({ error: "Query is required and must be a string" }, { status: 400 })
-    }
-
     // Build Wolfram Alpha API URL
+    const baseUrl = "http://api.wolframalpha.com/v2/query"
     const params = new URLSearchParams({
+      appid: appId,
       input: query,
-      appid: WOLFRAM_APP_ID,
-      output: "json",
       format: "plaintext,image",
-      podstate: "Result__Step-by-step solution",
-      scanner: "Solve,Simplify,Factor,Expand,Derivative,Integral,Plot,Limit",
+      output: "json",
+      includepodid: "Solution,Result,DecimalApproximation,Plot",
     })
 
     if (includesteps) {
-      params.append("podstate", "Result__Step-by-step solution")
-      params.append("includepodid", "Solution")
+      params.append("podstate", "Step-by-step solution")
     }
 
-    const wolframUrl = `http://api.wolframalpha.com/v2/query?${params.toString()}`
-
-    console.log("Calling Wolfram Alpha API:", wolframUrl.replace(WOLFRAM_APP_ID, "***"))
-
-    const response = await fetch(wolframUrl, {
-      method: "GET",
-      headers: {
-        "User-Agent": "Math Calculator App",
-      },
-    })
+    const response = await fetch(`${baseUrl}?${params}`)
 
     if (!response.ok) {
-      throw new Error(`Wolfram Alpha API error: ${response.status} ${response.statusText}`)
+      throw new Error(`Wolfram Alpha API error: ${response.status}`)
     }
 
-    const data: WolframResponse = await response.json()
+    const data = await response.json()
+
+    // Parse Wolfram Alpha response
     const result = parseWolframResponse(data, query, format)
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error("Error calling Wolfram Alpha API:", error)
-
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ error: "Failed to process the mathematical query" }, { status: 500 })
+    console.error("Wolfram Alpha API error:", error)
+    return NextResponse.json({ error: "Failed to process query with Wolfram Alpha" }, { status: 500 })
   }
+}
+
+function parseWolframResponse(data: any, originalQuery: string, format: string) {
+  const result = {
+    input: originalQuery,
+    solution: "",
+    steps: [] as string[],
+    type: "Mathematical",
+    images: [] as string[],
+    plots: [] as string[],
+    assumptions: [] as string[],
+    warnings: [] as string[],
+    success: false,
+    queryresult: data,
+  }
+
+  if (!data.queryresult) {
+    result.solution = "Unable to process query"
+    return result
+  }
+
+  const queryResult = data.queryresult
+
+  if (!queryResult.success) {
+    result.solution = "No solution found"
+    result.warnings.push("Wolfram Alpha could not interpret the query")
+    return result
+  }
+
+  result.success = true
+
+  // Extract assumptions
+  if (queryResult.assumptions) {
+    result.assumptions = queryResult.assumptions
+      .map((assumption: any) => assumption.text || assumption.word)
+      .filter(Boolean)
+  }
+
+  // Extract solution from pods
+  if (queryResult.pods) {
+    for (const pod of queryResult.pods) {
+      // Main solution/result
+      if (pod.id === "Solution" || pod.id === "Result" || pod.id === "DecimalApproximation") {
+        if (pod.subpods && pod.subpods[0]) {
+          result.solution = pod.subpods[0].plaintext || "Solution found"
+        }
+      }
+
+      // Step-by-step solutions
+      if (pod.title && pod.title.includes("step") && pod.subpods) {
+        for (const subpod of pod.subpods) {
+          if (subpod.plaintext) {
+            result.steps.push(subpod.plaintext)
+          }
+        }
+      }
+
+      // Images and plots
+      if (pod.subpods) {
+        for (const subpod of pod.subpods) {
+          if (subpod.img && subpod.img.src) {
+            if (pod.id === "Plot" || pod.title?.includes("plot")) {
+              result.plots.push(subpod.img.src)
+            } else {
+              result.images.push(subpod.img.src)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // If no solution found in specific pods, try to get from any pod
+  if (!result.solution && queryResult.pods) {
+    for (const pod of queryResult.pods) {
+      if (pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
+        result.solution = pod.subpods[0].plaintext
+        break
+      }
+    }
+  }
+
+  // Determine problem type
+  if (originalQuery.toLowerCase().includes("integrate")) {
+    result.type = "Integration"
+  } else if (originalQuery.toLowerCase().includes("derivative")) {
+    result.type = "Differentiation"
+  } else if (originalQuery.toLowerCase().includes("solve")) {
+    result.type = "Equation Solving"
+  } else if (originalQuery.toLowerCase().includes("plot")) {
+    result.type = "Plotting"
+  } else if (originalQuery.toLowerCase().includes("factor")) {
+    result.type = "Factorization"
+  } else if (originalQuery.toLowerCase().includes("limit")) {
+    result.type = "Limits"
+  }
+
+  return result
 }

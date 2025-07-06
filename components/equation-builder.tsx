@@ -2,10 +2,10 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Calculator, Plus, Minus, ImagePlusIcon as MultiplyIcon, Divide, Equal } from "lucide-react"
 
 interface EquationBuilderProps {
   onEquationBuilt: (equation: string) => void
@@ -13,48 +13,6 @@ interface EquationBuilderProps {
 
 export function EquationBuilder({ onEquationBuilt }: EquationBuilderProps) {
   const [equation, setEquation] = useState("")
-
-  const operators = [
-    { symbol: "+", label: "Plus" },
-    { symbol: "-", label: "Minus" },
-    { symbol: "*", label: "Multiply" },
-    { symbol: "/", label: "Divide" },
-    { symbol: "^", label: "Power" },
-    { symbol: "=", label: "Equals" },
-    { symbol: "(", label: "(" },
-    { symbol: ")", label: ")" },
-  ]
-
-  const functions = [
-    { symbol: "sin(", label: "sin" },
-    { symbol: "cos(", label: "cos" },
-    { symbol: "tan(", label: "tan" },
-    { symbol: "log(", label: "log" },
-    { symbol: "ln(", label: "ln" },
-    { symbol: "sqrt(", label: "√" },
-    { symbol: "abs(", label: "|x|" },
-    { symbol: "exp(", label: "e^x" },
-  ]
-
-  const constants = [
-    { symbol: "pi", label: "π" },
-    { symbol: "e", label: "e" },
-    { symbol: "x", label: "x" },
-    { symbol: "y", label: "y" },
-    { symbol: "z", label: "z" },
-    { symbol: "t", label: "t" },
-  ]
-
-  const operations = [
-    { symbol: "solve ", label: "Solve" },
-    { symbol: "integrate ", label: "∫" },
-    { symbol: "derivative ", label: "d/dx" },
-    { symbol: "limit ", label: "lim" },
-    { symbol: "factor ", label: "Factor" },
-    { symbol: "expand ", label: "Expand" },
-    { symbol: "simplify ", label: "Simplify" },
-    { symbol: "plot ", label: "Plot" },
-  ]
 
   const addToEquation = (symbol: string) => {
     setEquation((prev) => prev + symbol)
@@ -70,33 +28,68 @@ export function EquationBuilder({ onEquationBuilt }: EquationBuilderProps) {
     }
   }
 
+  const symbols = [
+    { label: "x", value: "x" },
+    { label: "y", value: "y" },
+    { label: "z", value: "z" },
+    { label: "+", value: " + ", icon: Plus },
+    { label: "−", value: " - ", icon: Minus },
+    { label: "×", value: " * ", icon: MultiplyIcon },
+    { label: "÷", value: " / ", icon: Divide },
+    { label: "=", value: " = ", icon: Equal },
+    { label: "x²", value: "^2" },
+    { label: "x³", value: "^3" },
+    { label: "√", value: "sqrt(" },
+    { label: "∫", value: "integrate " },
+    { label: "d/dx", value: "derivative of " },
+    { label: "lim", value: "limit " },
+    { label: "sin", value: "sin(" },
+    { label: "cos", value: "cos(" },
+    { label: "tan", value: "tan(" },
+    { label: "ln", value: "ln(" },
+    { label: "log", value: "log(" },
+    { label: "e", value: "e" },
+    { label: "π", value: "pi" },
+    { label: "(", value: "(" },
+    { label: ")", value: ")" },
+    { label: "∞", value: "infinity" },
+  ]
+
+  const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+
+  const operations = [
+    { label: "Solve", value: "solve " },
+    { label: "Factor", value: "factor " },
+    { label: "Expand", value: "expand " },
+    { label: "Simplify", value: "simplify " },
+    { label: "Plot", value: "plot " },
+  ]
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Equation Builder</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Calculator className="h-5 w-5" />
+          Equation Builder
+        </CardTitle>
+        <CardDescription>Build your mathematical expression using buttons below</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Current Equation Display */}
-        <div>
-          <label className="text-sm font-medium mb-2 block">Current Equation:</label>
-          <Input
-            value={equation}
-            onChange={(e) => setEquation(e.target.value)}
-            placeholder="Build your equation using the buttons below or type directly"
-            className="font-mono"
-          />
+        {/* Display */}
+        <div className="p-4 bg-muted rounded-lg min-h-[60px] font-mono text-lg border-2 border-primary/20">
+          {equation || "Start building your equation..."}
         </div>
 
         {/* Operations */}
         <div>
-          <h4 className="text-sm font-medium mb-2">Operations:</h4>
+          <h4 className="text-sm font-medium mb-2">Operations</h4>
           <div className="flex flex-wrap gap-2">
-            {operations.map((op) => (
+            {operations.map((op, index) => (
               <Badge
-                key={op.symbol}
+                key={index}
                 variant="outline"
-                className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
-                onClick={() => addToEquation(op.symbol)}
+                className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                onClick={() => addToEquation(op.value)}
               >
                 {op.label}
               </Badge>
@@ -106,95 +99,74 @@ export function EquationBuilder({ onEquationBuilt }: EquationBuilderProps) {
 
         <Separator />
 
-        {/* Basic Operators */}
-        <div>
-          <h4 className="text-sm font-medium mb-2">Operators:</h4>
-          <div className="flex flex-wrap gap-2">
-            {operators.map((op) => (
-              <Badge
-                key={op.symbol}
-                variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80"
-                onClick={() => addToEquation(op.symbol)}
-              >
-                {op.symbol}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Functions */}
-        <div>
-          <h4 className="text-sm font-medium mb-2">Functions:</h4>
-          <div className="flex flex-wrap gap-2">
-            {functions.map((func) => (
-              <Badge
-                key={func.symbol}
-                variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80"
-                onClick={() => addToEquation(func.symbol)}
-              >
-                {func.label}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Constants */}
-        <div>
-          <h4 className="text-sm font-medium mb-2">Constants & Variables:</h4>
-          <div className="flex flex-wrap gap-2">
-            {constants.map((const_) => (
-              <Badge
-                key={const_.symbol}
-                variant="secondary"
-                className="cursor-pointer hover:bg-secondary/80"
-                onClick={() => addToEquation(const_.symbol)}
-              >
-                {const_.label}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
         {/* Numbers */}
         <div>
-          <h4 className="text-sm font-medium mb-2">Numbers:</h4>
+          <h4 className="text-sm font-medium mb-2">Numbers</h4>
           <div className="grid grid-cols-5 gap-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((num) => (
-              <Button key={num} variant="outline" size="sm" onClick={() => addToEquation(num.toString())}>
+            {numbers.map((num, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                onClick={() => addToEquation(num)}
+                className="hover:bg-primary hover:text-primary-foreground"
+              >
                 {num}
               </Button>
             ))}
           </div>
         </div>
 
-        {/* Action Buttons */}
+        <Separator />
+
+        {/* Mathematical Symbols */}
+        <div>
+          <h4 className="text-sm font-medium mb-2">Symbols & Functions</h4>
+          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+            {symbols.map((symbol, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                onClick={() => addToEquation(symbol.value)}
+                className="hover:bg-primary hover:text-primary-foreground flex items-center justify-center"
+              >
+                {symbol.icon ? <symbol.icon className="h-4 w-4" /> : symbol.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions */}
         <div className="flex gap-2 pt-4">
           <Button onClick={buildEquation} className="flex-1" disabled={!equation.trim()}>
-            Use Equation
+            Use This Equation
           </Button>
-          <Button onClick={clearEquation} variant="outline">
+          <Button variant="outline" onClick={clearEquation}>
             Clear
           </Button>
         </div>
 
         {/* Quick Examples */}
         <div>
-          <h4 className="text-sm font-medium mb-2">Quick Examples:</h4>
+          <h4 className="text-sm font-medium mb-2">Quick Examples</h4>
           <div className="space-y-1">
-            {["solve x^2 + 5*x + 6 = 0", "integrate sin(x)", "derivative x^3 + 2*x^2", "limit sin(x)/x as x->0"].map(
-              (example) => (
-                <Badge
-                  key={example}
-                  variant="outline"
-                  className="cursor-pointer hover:bg-muted text-xs block w-full text-left p-2"
-                  onClick={() => setEquation(example)}
-                >
-                  {example}
-                </Badge>
-              ),
-            )}
+            {[
+              "solve x^2 + 5x + 6 = 0",
+              "integrate sin(x) dx",
+              "derivative of x^3 + 2x^2",
+              "factor x^2 - 9",
+              "plot y = x^2 + 2x - 3",
+            ].map((example, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="cursor-pointer hover:bg-secondary/80 transition-colors text-xs block w-full text-left p-2 h-auto whitespace-normal"
+                onClick={() => setEquation(example)}
+              >
+                {example}
+              </Badge>
+            ))}
           </div>
         </div>
       </CardContent>

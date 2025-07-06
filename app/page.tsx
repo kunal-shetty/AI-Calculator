@@ -32,11 +32,13 @@ import {
   Share2,
   Trash2,
   X,
+  Palette,
+  Settings,
 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { EquationBuilder } from "@/components/equation-builder"
-import { VoiceInput } from "@/components/voice-input"
 import { HistoryPanel } from "@/components/history-panel"
+import { ColorCustomizer } from "@/components/color-customizer"
 
 interface MathResult {
   input: string
@@ -59,6 +61,59 @@ interface HistoryItem {
   favorite: boolean
 }
 
+interface ColorTheme {
+  primary: string
+  secondary: string
+  accent: string
+  background: string
+  name: string
+}
+
+const defaultThemes: ColorTheme[] = [
+  {
+    name: "Ocean Blue",
+    primary: "221.2 83.2% 53.3%",
+    secondary: "210 40% 96%",
+    accent: "210 40% 96%",
+    background: "0 0% 100%",
+  },
+  {
+    name: "Forest Green",
+    primary: "142.1 76.2% 36.3%",
+    secondary: "138 76% 97%",
+    accent: "138 76% 97%",
+    background: "0 0% 100%",
+  },
+  {
+    name: "Sunset Orange",
+    primary: "24.6 95% 53.1%",
+    secondary: "24 100% 97%",
+    accent: "24 100% 97%",
+    background: "0 0% 100%",
+  },
+  {
+    name: "Royal Purple",
+    primary: "262.1 83.3% 57.8%",
+    secondary: "270 100% 98%",
+    accent: "270 100% 98%",
+    background: "0 0% 100%",
+  },
+  {
+    name: "Rose Pink",
+    primary: "346.8 77.2% 49.8%",
+    secondary: "355 100% 97%",
+    accent: "355 100% 97%",
+    background: "0 0% 100%",
+  },
+  {
+    name: "Cyber Teal",
+    primary: "173.4 80.4% 40%",
+    secondary: "180 100% 97%",
+    accent: "180 100% 97%",
+    background: "0 0% 100%",
+  },
+]
+
 export default function Home() {
   const [input, setInput] = useState("")
   const [result, setResult] = useState<MathResult | null>(null)
@@ -66,11 +121,13 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [favorites, setFavorites] = useState<HistoryItem[]>([])
-  const [inputMethod, setInputMethod] = useState<"text" | "voice" | "builder" | "upload">("text")
+  const [inputMethod, setInputMethod] = useState<"text" | "builder" | "upload">("text")
   const [showHistory, setShowHistory] = useState(false)
+  const [showColorCustomizer, setShowColorCustomizer] = useState(false)
   const [outputFormat, setOutputFormat] = useState<"simple" | "detailed" | "step-by-step">("detailed")
+  const [currentTheme, setCurrentTheme] = useState<ColorTheme>(defaultThemes[0])
 
-  // Load history from localStorage on mount
+  // Load saved preferences
   useEffect(() => {
     const savedHistory = localStorage.getItem("math-calculator-history")
     if (savedHistory) {
@@ -93,7 +150,29 @@ export default function Home() {
         })),
       )
     }
+
+    const savedTheme = localStorage.getItem("math-calculator-theme")
+    if (savedTheme) {
+      const theme = JSON.parse(savedTheme)
+      setCurrentTheme(theme)
+      applyTheme(theme)
+    }
   }, [])
+
+  // Apply theme to CSS variables
+  const applyTheme = (theme: ColorTheme) => {
+    const root = document.documentElement
+    root.style.setProperty("--primary", theme.primary)
+    root.style.setProperty("--secondary", theme.secondary)
+    root.style.setProperty("--accent", theme.accent)
+    root.style.setProperty("--background", theme.background)
+  }
+
+  const handleThemeChange = (theme: ColorTheme) => {
+    setCurrentTheme(theme)
+    applyTheme(theme)
+    localStorage.setItem("math-calculator-theme", JSON.stringify(theme))
+  }
 
   // Save history to localStorage
   const saveToHistory = (input: string, result: MathResult) => {
@@ -146,16 +225,11 @@ export default function Home() {
     }
   }
 
-  const handleVoiceInput = (transcript: string) => {
-    setInput(transcript)
-  }
-
   const handleEquationBuilt = (equation: string) => {
     setInput(equation)
   }
 
   const handleFileUpload = async (file: File) => {
-    // Handle image/PDF upload for equation recognition
     const formData = new FormData()
     formData.append("file", file)
 
@@ -195,7 +269,7 @@ export default function Home() {
     navigator.clipboard.writeText(text)
   }
 
-  const exportResult = (format: "txt" | "pdf" | "json") => {
+  const exportResult = (format: "txt" | "json") => {
     if (!result) return
 
     const data = {
@@ -223,19 +297,6 @@ export default function Home() {
     }
   }
 
-  const exampleProblems = [
-    "solve x^2 + 5x + 6 = 0",
-    "integrate sin(x) dx from 0 to pi",
-    "derivative of x^3 + 2x^2 - 5x + 1",
-    "limit of (sin x)/x as x approaches 0",
-    "factor x^4 - 16",
-    "plot y = x^2 + 2x - 3",
-    "solve system: 2x + y = 5, x - y = 1",
-    "matrix multiplication [[1,2],[3,4]] * [[5,6],[7,8]]",
-    "fibonacci sequence 20 terms",
-    "prime factorization of 1024",
-  ]
-
   const mathCategories = [
     { name: "Algebra", examples: ["solve x^2 + 5x + 6 = 0", "factor x^2 - 9", "expand (x+2)^3"] },
     { name: "Calculus", examples: ["integrate sin(x) dx", "derivative of x^3", "limit x->0 sin(x)/x"] },
@@ -246,23 +307,38 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Calculator className="h-6 w-6 text-primary" />
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl shadow-lg">
+              <Calculator className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Advanced AI Math Calculator</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                Advanced AI Math Calculator
+              </h1>
+              <p className="text-muted-foreground text-lg">
                 Powered by Wolfram Alpha - Solve any math problem with step-by-step solutions
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={() => setShowHistory(!showHistory)}>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowColorCustomizer(true)}
+              className="hover:bg-primary/10 transition-colors"
+            >
+              <Palette className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowHistory(!showHistory)}
+              className="hover:bg-primary/10 transition-colors"
+            >
               <History className="h-4 w-4" />
             </Button>
             <ThemeToggle />
@@ -273,16 +349,16 @@ export default function Home() {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Input Methods */}
-            <Card>
-              <CardHeader>
+            <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5" />
+                    <Lightbulb className="h-5 w-5 text-primary" />
                     Enter Your Math Problem
                   </span>
                   <div className="flex items-center gap-2">
                     <Select value={outputFormat} onValueChange={(value: any) => setOutputFormat(value)}>
-                      <SelectTrigger className="w-40">
+                      <SelectTrigger className="w-40 border-primary/20">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -293,77 +369,100 @@ export default function Home() {
                     </Select>
                   </div>
                 </CardTitle>
-                <CardDescription>Choose your preferred input method and output format</CardDescription>
+                <CardDescription className="text-muted-foreground/80">
+                  Choose your preferred input method and output format
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <Tabs value={inputMethod} onValueChange={(value: any) => setInputMethod(value)}>
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="text">Text</TabsTrigger>
-                    <TabsTrigger value="voice">Voice</TabsTrigger>
-                    <TabsTrigger value="builder">Builder</TabsTrigger>
-                    <TabsTrigger value="upload">Upload</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+                    <TabsTrigger
+                      value="text"
+                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    >
+                      Text
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="builder"
+                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    >
+                      Builder
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="upload"
+                      className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    >
+                      Upload
+                    </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="text" className="space-y-4">
+                  <TabsContent value="text" className="space-y-4 mt-6">
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="flex gap-2">
+                      <div className="relative">
                         <Textarea
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           placeholder="e.g., solve x^2 + 5x + 6 = 0, integrate sin(x) dx, plot y = x^2"
-                          className="flex-1 min-h-[100px]"
+                          className="min-h-[120px] border-primary/20 focus:border-primary/50 bg-background/50 backdrop-blur-sm resize-none"
                           disabled={loading}
                         />
+                        {input && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setInput("")}
+                            className="absolute top-2 right-2 h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      <div className="flex gap-2">
-                        <Button type="submit" disabled={loading || !input.trim()} className="flex-1">
-                          {loading ? (
-                            <>
-                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                              Solving with Wolfram Alpha...
-                            </>
-                          ) : (
-                            "Solve Problem"
-                          )}
-                        </Button>
-                        <Button type="button" variant="outline" onClick={() => setInput("")}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        type="submit"
+                        disabled={loading || !input.trim()}
+                        className="w-full h-12 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
+                      >
+                        {loading ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                            Solving with Wolfram Alpha...
+                          </>
+                        ) : (
+                          <>
+                            <Calculator className="h-5 w-5 mr-2" />
+                            Solve Problem
+                          </>
+                        )}
+                      </Button>
                     </form>
                   </TabsContent>
 
-                  <TabsContent value="voice">
-                    <VoiceInput onTranscript={handleVoiceInput} />
-                    {input && (
-                      <div className="mt-4">
-                        <p className="text-sm text-muted-foreground mb-2">Recognized:</p>
-                        <div className="p-3 bg-muted rounded-lg">{input}</div>
-                        <Button onClick={handleSubmit} className="mt-2 w-full" disabled={loading}>
-                          Solve Problem
-                        </Button>
-                      </div>
-                    )}
-                  </TabsContent>
-
-                  <TabsContent value="builder">
+                  <TabsContent value="builder" className="mt-6">
                     <EquationBuilder onEquationBuilt={handleEquationBuilt} />
                     {input && (
-                      <div className="mt-4">
-                        <p className="text-sm text-muted-foreground mb-2">Built equation:</p>
-                        <div className="p-3 bg-muted rounded-lg font-mono">{input}</div>
-                        <Button onClick={handleSubmit} className="mt-2 w-full" disabled={loading}>
+                      <div className="mt-4 space-y-3">
+                        <p className="text-sm text-muted-foreground">Built equation:</p>
+                        <div className="p-4 bg-muted/50 rounded-lg font-mono text-sm border border-primary/20">
+                          {input}
+                        </div>
+                        <Button
+                          onClick={handleSubmit}
+                          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                          disabled={loading}
+                        >
+                          <Calculator className="h-4 w-4 mr-2" />
                           Solve Problem
                         </Button>
                       </div>
                     )}
                   </TabsContent>
 
-                  <TabsContent value="upload">
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-                      <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-lg font-medium mb-2">Upload Image or PDF</p>
-                      <p className="text-sm text-muted-foreground mb-4">
+                  <TabsContent value="upload" className="mt-6">
+                    <div className="border-2 border-dashed border-primary/30 rounded-xl p-12 text-center bg-gradient-to-br from-primary/5 to-transparent hover:from-primary/10 transition-colors">
+                      <Upload className="h-16 w-16 mx-auto mb-4 text-primary/60" />
+                      <p className="text-xl font-medium mb-2">Upload Image or PDF</p>
+                      <p className="text-muted-foreground mb-6">
                         Upload an image containing mathematical equations for OCR recognition
                       </p>
                       <input
@@ -377,7 +476,11 @@ export default function Home() {
                         id="file-upload"
                       />
                       <label htmlFor="file-upload">
-                        <Button variant="outline" className="cursor-pointer bg-transparent">
+                        <Button
+                          variant="outline"
+                          className="cursor-pointer border-primary/30 hover:bg-primary/10 bg-transparent"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
                           Choose File
                         </Button>
                       </label>
@@ -389,7 +492,7 @@ export default function Home() {
 
             {/* Error Display */}
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="border-destructive/50 bg-destructive/5">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
@@ -397,11 +500,14 @@ export default function Home() {
 
             {/* Loading State */}
             {loading && (
-              <Card>
-                <CardContent className="flex items-center justify-center py-12">
+              <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
+                <CardContent className="flex items-center justify-center py-16">
                   <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-                    <p className="text-muted-foreground">Processing with Wolfram Alpha...</p>
+                    <div className="relative">
+                      <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
+                      <div className="absolute inset-0 h-12 w-12 mx-auto rounded-full border-2 border-primary/20"></div>
+                    </div>
+                    <p className="text-lg font-medium text-muted-foreground">Processing with Wolfram Alpha...</p>
                     <p className="text-sm text-muted-foreground mt-2">This may take a few seconds</p>
                   </div>
                 </CardContent>
@@ -410,20 +516,30 @@ export default function Home() {
 
             {/* Results Display */}
             {result && (
-              <Card>
-                <CardHeader>
+              <Card className="shadow-xl border-0 bg-card/50 backdrop-blur-sm">
+                <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
+                      <div className="p-2 bg-primary/20 rounded-lg">
+                        <Calculator className="h-5 w-5 text-primary" />
+                      </div>
                       Solution
-                      <Badge variant="outline">{result.type}</Badge>
+                      <Badge variant="outline" className="border-primary/30 text-primary">
+                        {result.type}
+                      </Badge>
                     </span>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(result.solution)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(result.solution)}
+                        className="hover:bg-primary/10"
+                      >
                         <Copy className="h-4 w-4" />
                       </Button>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="hover:bg-primary/10 bg-transparent">
                             <Download className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
@@ -433,35 +549,42 @@ export default function Home() {
                             <DialogDescription>Choose export format</DialogDescription>
                           </DialogHeader>
                           <div className="flex gap-2">
-                            <Button onClick={() => exportResult("txt")} variant="outline">
+                            <Button onClick={() => exportResult("txt")} variant="outline" className="flex-1">
+                              <Download className="h-4 w-4 mr-2" />
                               Text File
                             </Button>
-                            <Button onClick={() => exportResult("json")} variant="outline">
+                            <Button onClick={() => exportResult("json")} variant="outline" className="flex-1">
+                              <Download className="h-4 w-4 mr-2" />
                               JSON
                             </Button>
                           </div>
                         </DialogContent>
                       </Dialog>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="hover:bg-primary/10 bg-transparent">
                         <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6 p-6">
                   <div>
-                    <h4 className="font-semibold text-sm text-muted-foreground mb-2">Problem:</h4>
-                    <div className="p-3 bg-muted rounded-lg font-mono text-sm">{result.input}</div>
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-3">Problem:</h4>
+                    <div className="p-4 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg font-mono text-sm border border-primary/10">
+                      {result.input}
+                    </div>
                   </div>
 
-                  <Separator />
+                  <Separator className="bg-primary/20" />
 
                   {result.assumptions && result.assumptions.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-sm text-muted-foreground mb-2">Assumptions:</h4>
-                      <div className="space-y-1">
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-3">Assumptions:</h4>
+                      <div className="space-y-2">
                         {result.assumptions.map((assumption, index) => (
-                          <div key={index} className="p-2 bg-blue-50 dark:bg-blue-950 rounded text-sm">
+                          <div
+                            key={index}
+                            className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-sm border border-blue-200/50 dark:border-blue-800/50"
+                          >
                             {assumption}
                           </div>
                         ))}
@@ -471,12 +594,17 @@ export default function Home() {
 
                   {result.steps && result.steps.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-sm text-muted-foreground mb-2">Solution Steps:</h4>
-                      <div className="space-y-2">
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-3">Solution Steps:</h4>
+                      <div className="space-y-3">
                         {result.steps.map((step, index) => (
-                          <div key={index} className="p-3 bg-muted/50 rounded-lg text-sm border-l-2 border-primary/20">
-                            <span className="font-medium text-primary mr-2">Step {index + 1}:</span>
-                            {step}
+                          <div
+                            key={index}
+                            className="p-4 bg-gradient-to-r from-muted/30 to-muted/10 rounded-lg text-sm border-l-4 border-primary/40"
+                          >
+                            <span className="font-semibold text-primary mr-2 bg-primary/10 px-2 py-1 rounded">
+                              Step {index + 1}
+                            </span>
+                            <span className="ml-2">{step}</span>
                           </div>
                         ))}
                       </div>
@@ -484,31 +612,32 @@ export default function Home() {
                   )}
 
                   <div>
-                    <h4 className="font-semibold text-sm text-muted-foreground mb-2">Final Answer:</h4>
-                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                      <div className="font-mono text-lg font-semibold text-primary">{result.solution}</div>
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-3">Final Answer:</h4>
+                    <div className="p-6 bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/20 rounded-xl">
+                      <div className="font-mono text-xl font-bold text-primary">{result.solution}</div>
                     </div>
                   </div>
 
                   {result.images && result.images.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-sm text-muted-foreground mb-2">Visual Results:</h4>
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-3">Visual Results:</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {result.images.map((image, index) => (
-                          <img
-                            key={index}
-                            src={image || "/placeholder.svg"}
-                            alt={`Result ${index + 1}`}
-                            className="rounded-lg border"
-                          />
+                          <div key={index} className="border-2 border-primary/20 rounded-lg overflow-hidden">
+                            <img
+                              src={image || "/placeholder.svg"}
+                              alt={`Result ${index + 1}`}
+                              className="w-full h-auto"
+                            />
+                          </div>
                         ))}
                       </div>
                     </div>
                   )}
 
                   {result.warnings && result.warnings.length > 0 && (
-                    <Alert>
-                      <AlertCircle className="h-4 w-4" />
+                    <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
                       <AlertDescription>
                         <div className="space-y-1">
                           {result.warnings.map((warning, index) => (
@@ -526,22 +655,25 @@ export default function Home() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Examples */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Examples</CardTitle>
+            <Card className="shadow-lg border-0 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-primary" />
+                  Quick Examples
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-60">
-                  <div className="space-y-3">
+              <CardContent className="p-4">
+                <ScrollArea className="h-80">
+                  <div className="space-y-4">
                     {mathCategories.map((category, index) => (
                       <div key={index}>
-                        <h4 className="font-medium text-sm mb-2">{category.name}</h4>
-                        <div className="space-y-1">
+                        <h4 className="font-semibold text-sm mb-2 text-primary">{category.name}</h4>
+                        <div className="space-y-2">
                           {category.examples.map((example, exIndex) => (
                             <Badge
                               key={exIndex}
                               variant="secondary"
-                              className="cursor-pointer hover:bg-secondary/80 transition-colors text-xs block w-full text-left"
+                              className="cursor-pointer hover:bg-primary/20 hover:text-primary transition-colors text-xs block w-full text-left p-2 h-auto whitespace-normal"
                               onClick={() => setInput(example)}
                             >
                               {example}
@@ -556,28 +688,41 @@ export default function Home() {
             </Card>
 
             {/* Recent History */}
-            <Card>
-              <CardHeader>
+            <Card className="shadow-lg border-0 bg-card/50 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
                 <CardTitle className="text-lg flex items-center justify-between">
-                  Recent History
-                  <Button variant="ghost" size="sm" onClick={() => setHistory([])}>
+                  <span className="flex items-center gap-2">
+                    <History className="h-5 w-5 text-primary" />
+                    Recent History
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setHistory([])}
+                    className="hover:bg-destructive/10 hover:text-destructive"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4">
                 <ScrollArea className="h-60">
                   {history.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">No history yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">No history yet</p>
                   ) : (
                     <div className="space-y-2">
                       {history.slice(0, 10).map((item) => (
-                        <div key={item.id} className="p-2 border rounded-lg hover:bg-muted/50 cursor-pointer group">
+                        <div
+                          key={item.id}
+                          className="p-3 border border-primary/10 rounded-lg hover:bg-primary/5 cursor-pointer group transition-colors"
+                        >
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0" onClick={() => setInput(item.input)}>
-                              <p className="text-xs font-medium truncate">{item.input}</p>
-                              <p className="text-xs text-muted-foreground truncate">{item.result.solution}</p>
-                              <p className="text-xs text-muted-foreground">{item.timestamp.toLocaleDateString()}</p>
+                              <p className="text-xs font-medium truncate text-primary">{item.input}</p>
+                              <p className="text-xs text-muted-foreground truncate mt-1">{item.result.solution}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {item.timestamp.toLocaleDateString()}
+                              </p>
                             </div>
                             <Button
                               variant="ghost"
@@ -586,9 +731,9 @@ export default function Home() {
                                 e.stopPropagation()
                                 toggleFavorite(item)
                               }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/10"
                             >
-                              <Star className={`h-3 w-3 ${item.favorite ? "fill-current" : ""}`} />
+                              <Star className={`h-3 w-3 ${item.favorite ? "fill-current text-primary" : ""}`} />
                             </Button>
                           </div>
                         </div>
@@ -612,6 +757,16 @@ export default function Home() {
               setShowHistory(false)
             }}
             onToggleFavorite={toggleFavorite}
+          />
+        )}
+
+        {/* Color Customizer */}
+        {showColorCustomizer && (
+          <ColorCustomizer
+            themes={defaultThemes}
+            currentTheme={currentTheme}
+            onThemeChange={handleThemeChange}
+            onClose={() => setShowColorCustomizer(false)}
           />
         )}
       </div>
