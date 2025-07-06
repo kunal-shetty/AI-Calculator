@@ -75,83 +75,53 @@ interface ColorTheme {
 const defaultThemes: ColorTheme[] = [
   {
     name: "Ocean Blue",
-    primary: "221.2 83.2% 53.3%",
-    secondary: "210 40% 96%",
-    accent: "210 40% 96%",
-    background: "0 0% 100%",
-    foreground: "222.2 84% 4.9%",
-    mutedForeground: "215.4 16.3% 46.9%",
-    cardForeground: "222.2 84% 4.9%",
+    primary: "59 130 246",
+    secondary: "241 245 249",
+    accent: "241 245 249",
+    background: "255 255 255",
+    foreground: "15 23 42",
+    mutedForeground: "100 116 139",
+    cardForeground: "15 23 42",
   },
   {
     name: "Forest Green",
-    primary: "142.1 76.2% 36.3%",
-    secondary: "138 76% 97%",
-    accent: "138 76% 97%",
-    background: "0 0% 100%",
-    foreground: "240 10% 3.9%",
-    mutedForeground: "240 3.8% 46.1%",
-    cardForeground: "240 10% 3.9%",
+    primary: "34 197 94",
+    secondary: "240 253 244",
+    accent: "240 253 244",
+    background: "255 255 255",
+    foreground: "15 23 42",
+    mutedForeground: "100 116 139",
+    cardForeground: "15 23 42",
   },
   {
     name: "Sunset Orange",
-    primary: "24.6 95% 53.1%",
-    secondary: "24 100% 97%",
-    accent: "24 100% 97%",
-    background: "0 0% 100%",
-    foreground: "20 14.3% 4.1%",
-    mutedForeground: "25 5.3% 44.7%",
-    cardForeground: "20 14.3% 4.1%",
+    primary: "249 115 22",
+    secondary: "255 247 237",
+    accent: "255 247 237",
+    background: "255 255 255",
+    foreground: "15 23 42",
+    mutedForeground: "100 116 139",
+    cardForeground: "15 23 42",
   },
   {
     name: "Royal Purple",
-    primary: "262.1 83.3% 57.8%",
-    secondary: "270 100% 98%",
-    accent: "270 100% 98%",
-    background: "0 0% 100%",
-    foreground: "224 71.4% 4.1%",
-    mutedForeground: "215.3 19.3% 34.5%",
-    cardForeground: "224 71.4% 4.1%",
+    primary: "147 51 234",
+    secondary: "250 245 255",
+    accent: "250 245 255",
+    background: "255 255 255",
+    foreground: "15 23 42",
+    mutedForeground: "100 116 139",
+    cardForeground: "15 23 42",
   },
   {
-    name: "Rose Pink",
-    primary: "346.8 77.2% 49.8%",
-    secondary: "355 100% 97%",
-    accent: "355 100% 97%",
-    background: "0 0% 100%",
-    foreground: "240 10% 3.9%",
-    mutedForeground: "240 5% 64.9%",
-    cardForeground: "240 10% 3.9%",
-  },
-  {
-    name: "Cyber Teal",
-    primary: "173.4 80.4% 40%",
-    secondary: "180 100% 97%",
-    accent: "180 100% 97%",
-    background: "0 0% 100%",
-    foreground: "185 6% 8%",
-    mutedForeground: "184 5% 48%",
-    cardForeground: "185 6% 8%",
-  },
-  {
-    name: "Dark Ocean",
-    primary: "221.2 83.2% 53.3%",
-    secondary: "217.2 32.6% 17.5%",
-    accent: "217.2 32.6% 17.5%",
-    background: "222.2 84% 4.9%",
-    foreground: "210 40% 98%",
-    mutedForeground: "215 20.2% 65.1%",
-    cardForeground: "210 40% 98%",
-  },
-  {
-    name: "Dark Forest",
-    primary: "142.1 76.2% 36.3%",
-    secondary: "240 3.7% 15.9%",
-    accent: "240 3.7% 15.9%",
-    background: "240 10% 3.9%",
-    foreground: "0 0% 98%",
-    mutedForeground: "240 5% 64.9%",
-    cardForeground: "0 0% 98%",
+    name: "Dark Mode",
+    primary: "96 165 250",
+    secondary: "51 65 85",
+    accent: "51 65 85",
+    background: "15 23 42",
+    foreground: "241 245 249",
+    mutedForeground: "148 163 184",
+    cardForeground: "241 245 249",
   },
 ]
 
@@ -209,6 +179,7 @@ export default function Home() {
     root.style.setProperty("--foreground", theme.foreground)
     root.style.setProperty("--muted-foreground", theme.mutedForeground)
     root.style.setProperty("--card-foreground", theme.cardForeground)
+    root.style.setProperty("--card", theme.background)
   }
 
   const handleThemeChange = (theme: ColorTheme) => {
@@ -377,7 +348,7 @@ export default function Home() {
               variant="outline"
               size="icon"
               onClick={() => setShowColorCustomizer(true)}
-              className="hover:bg-blue-50 transition-colors btn-clean"
+              className="hover:bg-blue-50 transition-colors"
             >
               <Palette className="h-4 w-4" />
             </Button>
@@ -385,7 +356,7 @@ export default function Home() {
               variant="outline"
               size="icon"
               onClick={() => setShowHistory(!showHistory)}
-              className="hover:bg-blue-50 transition-colors btn-clean"
+              className="hover:bg-blue-50 transition-colors"
             >
               <History className="h-4 w-4" />
             </Button>
@@ -397,34 +368,32 @@ export default function Home() {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Input Methods */}
-            <Card className="shadow-xl border-0 bg-card-clean">
+            <Card className="shadow-xl border-0">
               <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg">
-                <CardTitle className="flex items-center gap-2 text-readable">
+                <CardTitle className="flex items-center gap-2">
                   <Lightbulb className="h-5 w-5 text-blue-600" />
                   Enter Your Math Problem
                 </CardTitle>
-                <CardDescription className="text-readable-muted">
-                  Choose your preferred input method to solve mathematical problems
-                </CardDescription>
+                <CardDescription>Choose your preferred input method to solve mathematical problems</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
                 <Tabs value={inputMethod} onValueChange={(value: any) => setInputMethod(value)}>
-                  <TabsList className="grid w-full grid-cols-3 bg-gray-100">
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger
                       value="text"
-                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-readable"
+                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
                     >
                       Text
                     </TabsTrigger>
                     <TabsTrigger
                       value="builder"
-                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-readable"
+                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
                     >
                       Builder
                     </TabsTrigger>
                     <TabsTrigger
                       value="upload"
-                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-readable"
+                      className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
                     >
                       Upload
                     </TabsTrigger>
@@ -437,7 +406,7 @@ export default function Home() {
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           placeholder="Try: 1+1, solve x^2+5x+6=0, integrate sin(x), derivative of x^3"
-                          className="min-h-[120px] border-blue-200 focus:border-blue-500 bg-white/80 backdrop-blur-sm resize-none text-readable input-clean"
+                          className="min-h-[120px] border-blue-200 focus:border-blue-500 bg-white/80 backdrop-blur-sm resize-none"
                           disabled={loading}
                         />
                         {input && (
@@ -476,8 +445,8 @@ export default function Home() {
                     <EquationBuilder onEquationBuilt={handleEquationBuilt} />
                     {input && (
                       <div className="mt-4 space-y-3">
-                        <p className="text-sm text-readable-muted">Built equation:</p>
-                        <div className="p-4 bg-gray-50 rounded-lg font-mono text-sm border border-blue-200 text-readable">
+                        <p className="text-sm text-muted-foreground">Built equation:</p>
+                        <div className="p-4 bg-gray-50 rounded-lg font-mono text-sm border border-blue-200">
                           {input}
                         </div>
                         <Button
@@ -495,8 +464,8 @@ export default function Home() {
                   <TabsContent value="upload" className="mt-6">
                     <div className="border-2 border-dashed border-blue-300 rounded-xl p-12 text-center bg-gradient-to-br from-blue-50 to-transparent hover:from-blue-100 transition-colors">
                       <Upload className="h-16 w-16 mx-auto mb-4 text-blue-500" />
-                      <p className="text-xl font-medium mb-2 text-readable">Upload Image or PDF</p>
-                      <p className="text-readable-muted mb-6">
+                      <p className="text-xl font-medium mb-2">Upload Image or PDF</p>
+                      <p className="text-muted-foreground mb-6">
                         Upload an image containing mathematical equations for OCR recognition
                       </p>
                       <input
@@ -512,7 +481,7 @@ export default function Home() {
                       <label htmlFor="file-upload">
                         <Button
                           variant="outline"
-                          className="cursor-pointer border-blue-300 hover:bg-blue-50 bg-transparent text-readable"
+                          className="cursor-pointer border-blue-300 hover:bg-blue-50 bg-transparent"
                         >
                           <Upload className="h-4 w-4 mr-2" />
                           Choose File
@@ -534,15 +503,15 @@ export default function Home() {
 
             {/* Loading State */}
             {loading && (
-              <Card className="shadow-xl border-0 bg-card-clean">
+              <Card className="shadow-xl border-0">
                 <CardContent className="flex items-center justify-center py-16">
                   <div className="text-center">
                     <div className="relative">
                       <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-blue-600" />
                       <div className="absolute inset-0 h-12 w-12 mx-auto rounded-full border-2 border-blue-200"></div>
                     </div>
-                    <p className="text-lg font-medium text-readable">Processing with Wolfram Alpha...</p>
-                    <p className="text-sm text-readable-muted mt-2">This may take a few seconds</p>
+                    <p className="text-lg font-medium">Processing with Wolfram Alpha...</p>
+                    <p className="text-sm text-muted-foreground mt-2">This may take a few seconds</p>
                   </div>
                 </CardContent>
               </Card>
@@ -550,14 +519,14 @@ export default function Home() {
 
             {/* Results Display */}
             {result && (
-              <Card className="shadow-xl border-0 bg-card-clean">
+              <Card className="shadow-xl border-0">
                 <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-t-lg">
                   <CardTitle className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <div className="p-2 bg-green-100 rounded-lg">
                         <CheckCircle className="h-5 w-5 text-green-600" />
                       </div>
-                      <span className="text-readable">Solution</span>
+                      <span>Solution</span>
                       <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50">
                         {result.type}
                       </Badge>
@@ -567,34 +536,34 @@ export default function Home() {
                         variant="outline"
                         size="sm"
                         onClick={() => copyToClipboard(result.solution)}
-                        className="hover:bg-green-50 btn-clean"
+                        className="hover:bg-green-50"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="hover:bg-green-50 btn-clean bg-transparent">
+                          <Button variant="outline" size="sm" className="hover:bg-green-50 bg-transparent">
                             <Download className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle className="text-readable">Export Solution</DialogTitle>
-                            <DialogDescription className="text-readable-muted">Choose export format</DialogDescription>
+                            <DialogTitle>Export Solution</DialogTitle>
+                            <DialogDescription>Choose export format</DialogDescription>
                           </DialogHeader>
                           <div className="flex gap-2">
-                            <Button onClick={() => exportResult("txt")} variant="outline" className="flex-1 btn-clean">
+                            <Button onClick={() => exportResult("txt")} variant="outline" className="flex-1">
                               <Download className="h-4 w-4 mr-2" />
                               Text File
                             </Button>
-                            <Button onClick={() => exportResult("json")} variant="outline" className="flex-1 btn-clean">
+                            <Button onClick={() => exportResult("json")} variant="outline" className="flex-1">
                               <Download className="h-4 w-4 mr-2" />
                               JSON
                             </Button>
                           </div>
                         </DialogContent>
                       </Dialog>
-                      <Button variant="outline" size="sm" className="hover:bg-green-50 btn-clean bg-transparent">
+                      <Button variant="outline" size="sm" className="hover:bg-green-50 bg-transparent">
                         <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -602,23 +571,20 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="space-y-6 p-6">
                   <div>
-                    <h4 className="font-semibold text-sm text-readable-muted mb-3">Problem:</h4>
-                    <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg font-mono text-sm border border-gray-200 text-readable">
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-3">Problem:</h4>
+                    <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg font-mono text-sm border border-gray-200">
                       {result.input}
                     </div>
                   </div>
 
-                  <Separator className="bg-gray-200" />
+                  <Separator />
 
                   {result.assumptions && result.assumptions.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-sm text-readable-muted mb-3">Assumptions:</h4>
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-3">Assumptions:</h4>
                       <div className="space-y-2">
                         {result.assumptions.map((assumption, index) => (
-                          <div
-                            key={index}
-                            className="p-3 bg-blue-50 rounded-lg text-sm border border-blue-200 text-readable"
-                          >
+                          <div key={index} className="p-3 bg-blue-50 rounded-lg text-sm border border-blue-200">
                             {assumption}
                           </div>
                         ))}
@@ -628,17 +594,14 @@ export default function Home() {
 
                   {result.steps && result.steps.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-sm text-readable-muted mb-3">Solution Steps:</h4>
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-3">Solution Steps:</h4>
                       <div className="space-y-3">
                         {result.steps.map((step, index) => (
-                          <div
-                            key={index}
-                            className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg text-sm border-l-4 border-blue-400 step-item"
-                          >
+                          <div key={index} className="p-4 rounded-lg text-sm step-container">
                             <span className="font-semibold text-blue-600 mr-2 bg-blue-100 px-2 py-1 rounded">
                               Step {index + 1}
                             </span>
-                            <span className="ml-2 text-readable">{step}</span>
+                            <span className="ml-2">{step}</span>
                           </div>
                         ))}
                       </div>
@@ -646,17 +609,15 @@ export default function Home() {
                   )}
 
                   <div>
-                    <h4 className="font-semibold text-sm text-readable-muted mb-3">Final Answer:</h4>
-                    <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
-                      <div className="solution-mono text-2xl font-bold text-green-800 solution-display">
-                        {result.solution}
-                      </div>
+                    <h4 className="font-semibold text-sm text-muted-foreground mb-3">Final Answer:</h4>
+                    <div className="p-6 rounded-xl solution-result">
+                      <div className="text-2xl font-bold font-mono">{result.solution}</div>
                     </div>
                   </div>
 
                   {result.images && result.images.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-sm text-readable-muted mb-3">Visual Results:</h4>
+                      <h4 className="font-semibold text-sm text-muted-foreground mb-3">Visual Results:</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {result.images.map((image, index) => (
                           <div key={index} className="border-2 border-blue-200 rounded-lg overflow-hidden">
@@ -691,11 +652,11 @@ export default function Home() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Examples */}
-            <Card className="shadow-lg border-0 bg-card-clean">
+            <Card className="shadow-lg border-0">
               <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-t-lg">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Settings className="h-5 w-5 text-purple-600" />
-                  <span className="text-readable">Quick Examples</span>
+                  <span>Quick Examples</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
@@ -703,16 +664,18 @@ export default function Home() {
                   <div className="space-y-4">
                     {mathCategories.map((category, index) => (
                       <div key={index}>
-                        <h4 className="font-semibold text-sm mb-2 text-readable-primary">{category.name}</h4>
+                        <h4 className="font-semibold text-sm mb-2 text-blue-600">{category.name}</h4>
                         <div className="space-y-2">
                           {category.examples.map((example, exIndex) => (
-                            <div
+                            <Button
                               key={exIndex}
-                              className="badge-clean cursor-pointer hover:shadow-sm transition-all text-xs block w-full text-left p-3 rounded-lg"
+                              variant="outline"
+                              size="sm"
+                              className="w-full text-left justify-start h-auto p-3 text-xs hover:bg-blue-50 bg-transparent"
                               onClick={() => setInput(example)}
                             >
                               {example}
-                            </div>
+                            </Button>
                           ))}
                         </div>
                       </div>
@@ -723,12 +686,12 @@ export default function Home() {
             </Card>
 
             {/* Recent History */}
-            <Card className="shadow-lg border-0 bg-card-clean">
+            <Card className="shadow-lg border-0">
               <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-t-lg">
                 <CardTitle className="text-lg flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <History className="h-5 w-5 text-indigo-600" />
-                    <span className="text-readable">Recent History</span>
+                    <span>Recent History</span>
                   </span>
                   <Button
                     variant="ghost"
@@ -743,7 +706,7 @@ export default function Home() {
               <CardContent className="p-4">
                 <ScrollArea className="h-60">
                   {history.length === 0 ? (
-                    <p className="text-sm text-readable-muted text-center py-8">No history yet</p>
+                    <p className="text-sm text-muted-foreground text-center py-8">No history yet</p>
                   ) : (
                     <div className="space-y-2">
                       {history.slice(0, 10).map((item) => (
@@ -753,9 +716,11 @@ export default function Home() {
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1 min-w-0" onClick={() => setInput(item.input)}>
-                              <p className="text-xs font-medium truncate text-readable-primary">{item.input}</p>
-                              <p className="text-xs text-readable-muted truncate mt-1">{item.result.solution}</p>
-                              <p className="text-xs text-readable-muted mt-1">{item.timestamp.toLocaleDateString()}</p>
+                              <p className="text-xs font-medium truncate text-blue-600">{item.input}</p>
+                              <p className="text-xs text-muted-foreground truncate mt-1">{item.result.solution}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {item.timestamp.toLocaleDateString()}
+                              </p>
                             </div>
                             <Button
                               variant="ghost"
