@@ -55,5 +55,62 @@
   }
   body {
     @apply bg-background text-foreground;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Force text colors to be visible */
+  .text-foreground {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .text-card-foreground {
+    color: hsl(var(--card-foreground)) !important;
+  }
+
+  .text-primary {
+    color: hsl(var(--primary)) !important;
+  }
+
+  /* Ensure all text elements have proper colors */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  div,
+  label {
+    color: hsl(var(--foreground));
+  }
+
+  /* Badge specific fixes */
+  .badge-text {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Card content text */
+  .card-text {
+    color: hsl(var(--card-foreground)) !important;
+  }
+}
+
+/* Additional utility classes for better text visibility */
+@layer utilities {
+  .force-visible-text {
+    color: hsl(222.2 84% 4.9%) !important;
+  }
+
+  .force-visible-muted {
+    color: hsl(215.4 16.3% 46.9%) !important;
+  }
+
+  .force-visible-primary {
+    color: hsl(221.2 83.2% 53.3%) !important;
   }
 }
