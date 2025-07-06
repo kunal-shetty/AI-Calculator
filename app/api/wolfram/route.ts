@@ -12,13 +12,20 @@ export async function POST(request: NextRequest) {
     const appId = process.env.WOLFRAM_ALPHA_API_KEY
 
     if (!appId) {
-      return NextResponse.json(
-        {
-          error:
-            "Wolfram Alpha API key not configured. Please add WOLFRAM_ALPHA_API_KEY to your environment variables.",
-        },
-        { status: 500 },
-      )
+      console.log("Wolfram Alpha API key not found, using fallback")
+      // Return a more helpful fallback response
+      return NextResponse.json({
+        input: query,
+        solution: getFallbackSolution(query),
+        steps: getFallbackSteps(query),
+        type: "Fallback",
+        images: [],
+        plots: [],
+        assumptions: [],
+        warnings: ["Using fallback calculation. Add WOLFRAM_ALPHA_API_KEY to environment variables for full functionality."],
+        success: true,
+        queryresult: null,
+      })
     }
 
     // Build Wolfram Alpha API URL
@@ -28,11 +35,11 @@ export async function POST(request: NextRequest) {
       input: query,
       format: "plaintext,image",
       output: "json",
-      includepodid: "Solution,Result,DecimalApproximation,Value,Input,AlternateForm,ExactResult,DecimalForm",
-      scantimeout: "15",
-      podtimeout: "15",
-      formattimeout: "15",
-      parsetimeout: "15",
+      includepodid: "Solution,Result,DecimalApproximation,Value,Input,AlternateForm,ExactResult,DecimalForm,IntegerSolution,RationalSolution,AlgebraicSolution",
+      scantimeout: "10",
+      podtimeout: "10",
+      formattimeout: "10",
+      parsetimeout: "10",
     })
 
     console.log("Making request to Wolfram Alpha API for query:", query)
@@ -50,7 +57,20 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error("API Error Response:", errorText)
-      return NextResponse.json({ error: `Wolfram Alpha API error: ${response.status}` }, { status: response.status })
+      
+      // Return fallback on API error
+      return NextResponse.json({
+        input: query,
+        solution: getFallbackSolution(query),
+        steps: getFallbackSteps(query),
+        type: "Fallback",
+        images: [],
+        plots: [],
+        assumptions: [],
+        warnings: [`Wolfram Alpha API error (${response.status}). Using fallback calculation.`],
+        success: true,
+        queryresult: null,
+      })
     }
 
     const responseText = await response.text()
@@ -62,11 +82,41 @@ export async function POST(request: NextRequest) {
       data = JSON.parse(responseText)
     } catch (parseError) {
       console.error("JSON Parse Error:", parseError)
-      return NextResponse.json({ error: "Failed to parse Wolfram Alpha response" }, { status: 500 })
+      return NextResponse.json({
+        input: query,
+        solution: getFallbackSolution(query),
+        steps: getFallbackSteps(query),
+        type: "Fallback",
+        images: [],
+        plots: [],
+        assumptions: [],
+        warnings: ["Failed to parse Wolfram Alpha response. Using fallback calculation."],
+        success: true,
+        queryresult: null,
+      })
     }
 
     // Parse Wolfram Alpha response
     const result = parseWolframResponse(data, query)
+
+    // If Wolfram didn't find a solution, try fallback
+    if (!result.success || result.solution === "No solution found") {
+      const fallbackSolution = getFallbackSolution(query)
+      if (fallbackSolution !== "Unable to solve this problem") {
+        return NextResponse.json({
+          input: query,
+          solution: fallbackSolution,
+          steps: getFallbackSteps(query),
+          type: "Fallback",
+          images: [],
+          plots: [],
+          assumptions: [],
+          warnings: ["Wolfram Alpha couldn't solve this. Using built-in calculator."],
+          success: true,
+          queryresult: data,
+        })
+      }
+    }
 
     return NextResponse.json(result)
   } catch (error) {
@@ -76,6 +126,132 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     )
   }
+}
+
+function getFallbackSolution(query: string): string {
+  const cleanQuery = query.toLowerCase().trim()
+  
+  try {
+    // Handle basic arithmetic
+    if (/^[\d\s+\-*/().^]+$/.test(cleanQuery.replace(/\s/g, ''))) {
+      // Replace ^ with ** for JavaScript
+      const jsExpression = cleanQuery.replace(/\^/g, '**')
+      const result = eval(jsExpression)
+      return result.toString()
+    }
+    
+    // Handle simple equations
+    if (cleanQuery.includes('=') && cleanQuery.includes('x')) {
+      // Very basic linear equation solver
+      const match = cleanQuery.match(/([+-]?\d*\.?\d*)x\s*([+-])\s*(\d+\.?\d*)\s*=\s*(\d+\.?\d*)/)
+      if (match) {
+        const a = parseFloat(match[1]) || 1
+        const sign = match[2]
+        const b = parseFloat(match[3])
+        const c = parseFloat(match[4])
+        
+        const adjustedB = sign === '+' ? b : -b
+        const x = (c - adjustedB) / a
+        return `x = ${x}`
+      }
+    }
+    
+    // Handle basic functions
+    if (cleanQuery.includes('sqrt')) {
+      const match = cleanQuery.match(/sqrt\((\d+\.?\d*)\)/)
+      if (match) {
+        const result = Math.sqrt(parseFloat(match[1]))
+        return result.toString()
+      }
+    }
+    
+    if (cleanQuery.includes('sin')) {
+      const match = cleanQuery.match(/sin\((\d+\.?\d*)\)/)
+      if (match) {
+        const result = Math.sin(parseFloat(match[1]))
+        return result.toString()
+      }
+    }
+    
+    if (cleanQuery.includes('cos')) {
+      const match = cleanQuery.match(/cos\((\d+\.?\d*)\)/)
+      if (match) {
+        const result = Math.cos(parseFloat(match[1]))
+        return result.toString()
+      }
+    }
+    
+    if (cleanQuery.includes('tan')) {
+      const match = cleanQuery.match(/tan\((\d+\.?\d*)\)/)
+      if (match) {
+        const result = Math.tan(parseFloat(match[1]))
+        return result.toString()
+      }
+    }
+    
+    // Handle logarithms
+    if (cleanQuery.includes('log')) {
+      const match = cleanQuery.match(/log\((\d+\.?\d*)\)/)
+      if (match) {
+        const result = Math.log10(parseFloat(match[1]))
+        return result.toString()
+      }
+    }
+    
+    if (cleanQuery.includes('ln')) {
+      const match = cleanQuery.match(/ln\((\d+\.?\d*)\)/)
+      if (match) {
+        const result = Math.log(parseFloat(match[1]))
+        return result.toString()
+      }
+    }
+    
+    // Handle factorials
+    if (cleanQuery.includes('!')) {
+      const match = cleanQuery.match(/(\d+)!/)
+      if (match) {
+        const n = parseInt(match[1])
+        if (n <= 20) { // Prevent overflow
+          let result = 1
+          for (let i = 2; i <= n; i++) {
+            result *= i
+          }
+          return result.toString()
+        }
+      }
+    }
+    
+    return "Unable to solve this problem"
+  } catch (error) {
+    return "Unable to solve this problem"
+  }
+}
+
+function getFallbackSteps(query: string): string[] {
+  const cleanQuery = query.toLowerCase().trim()
+  
+  // Basic arithmetic steps
+  if (/^[\d\s+\-*/().^]+$/.test(cleanQuery.replace(/\s/g, ''))) {
+    return [
+      "Evaluate the expression using order of operations",
+      "Perform operations inside parentheses first",
+      "Handle exponents and roots",
+      "Multiply and divide from left to right",
+      "Add and subtract from left to right"
+    ]
+  }
+  
+  // Equation solving steps
+  if (cleanQuery.includes('=') && cleanQuery.includes('x')) {
+    return [
+      "Identify the linear equation",
+      "Isolate the variable x",
+      "Perform arithmetic operations",
+      "Verify the solution"
+    ]
+  }
+  
+  return ["Apply appropriate mathematical methods to solve the problem"]
 }
 
 function parseWolframResponse(data: any, originalQuery: string) {
@@ -124,9 +300,13 @@ function parseWolframResponse(data: any, originalQuery: string) {
     result.assumptions = queryResult.assumptions
       .map((assumption: any) => {
         if (assumption.template && assumption.values) {
-          return `${assumption.template.replace("${desc1}", assumption.values[0]?.desc || "").replace("${desc2}", assumption.values[1]?.desc || "")}`
+          return assumption.template.replace(/\$\{[^}]+\}/g, (match: string) => {
+            const key = match.slice(2, -1)
+            const value = assumption.values.find((v: any) => v.name === key)
+            return value ? value.desc : match
+          })
         }
-        return assumption.text || assumption.word
+        return assumption.text || assumption.word || ""
       })
       .filter(Boolean)
   }
@@ -143,50 +323,52 @@ function parseWolframResponse(data: any, originalQuery: string) {
       }
     })
 
-    // Look for the Result pod first (this is the most common for basic math)
-    const resultPod = queryResult.pods.find((pod: any) => pod.id === "Result")
-    if (resultPod && resultPod.subpods && resultPod.subpods[0] && resultPod.subpods[0].plaintext) {
-      result.solution = resultPod.subpods[0].plaintext
-      console.log(`Found solution in Result pod: ${result.solution}`)
-    }
+    // Priority order for solution pods
+    const solutionPodIds = [
+      "Result",
+      "Solution", 
+      "DecimalApproximation",
+      "ExactResult",
+      "DecimalForm",
+      "Value",
+      "AlternateForm",
+      "IntegerSolution",
+      "RationalSolution",
+      "AlgebraicSolution"
+    ]
 
-    // If no Result pod, try other solution pods
-    if (!result.solution) {
-      const solutionPodIds = [
-        "Solution",
-        "DecimalApproximation",
-        "ExactResult",
-        "DecimalForm",
-        "Value",
-        "AlternateForm",
-      ]
-
-      for (const podId of solutionPodIds) {
-        const pod = queryResult.pods.find((p: any) => p.id === podId)
-        if (pod && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
-          result.solution = pod.subpods[0].plaintext
-          console.log(`Found solution in ${podId}: ${result.solution}`)
-          break
-        }
+    // Look for solution in priority order
+    for (const podId of solutionPodIds) {
+      const pod = queryResult.pods.find((p: any) => p.id === podId)
+      if (pod && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
+        result.solution = pod.subpods[0].plaintext
+        console.log(`Found solution in ${podId}: ${result.solution}`)
+        break
       }
     }
 
-    // If still no solution, check by title keywords
+    // If no solution found by ID, check by title keywords
     if (!result.solution) {
+      const solutionKeywords = ["result", "solution", "value", "answer", "decimal", "exact"]
+      
       for (const pod of queryResult.pods) {
         if (pod.title && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
           const title = pod.title.toLowerCase()
-          if (
-            title.includes("result") ||
-            title.includes("solution") ||
-            title.includes("value") ||
-            title.includes("answer")
-          ) {
+          if (solutionKeywords.some(keyword => title.includes(keyword))) {
             result.solution = pod.subpods[0].plaintext
             console.log(`Found solution by title "${pod.title}": ${result.solution}`)
             break
           }
         }
+      }
+    }
+
+    // If still no solution, take the second pod (first is usually Input)
+    if (!result.solution && queryResult.pods.length > 1) {
+      const secondPod = queryResult.pods[1]
+      if (secondPod.subpods && secondPod.subpods[0] && secondPod.subpods[0].plaintext) {
+        result.solution = secondPod.subpods[0].plaintext
+        console.log(`Using second pod as solution: ${result.solution}`)
       }
     }
 
@@ -252,6 +434,12 @@ function parseWolframResponse(data: any, originalQuery: string) {
     result.type = "Simplification"
   }
 
-  console.log("Final result:", { solution: result.solution, steps: result.steps.length, type: result.type })
+  console.log("Final result:", { 
+    solution: result.solution, 
+    steps: result.steps.length, 
+    type: result.type,
+    success: result.success 
+  })
+  
   return result
 }
