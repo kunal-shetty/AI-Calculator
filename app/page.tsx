@@ -66,6 +66,9 @@ interface ColorTheme {
   secondary: string
   accent: string
   background: string
+  foreground: string
+  mutedForeground: string
+  cardForeground: string
   name: string
 }
 
@@ -76,6 +79,9 @@ const defaultThemes: ColorTheme[] = [
     secondary: "210 40% 96%",
     accent: "210 40% 96%",
     background: "0 0% 100%",
+    foreground: "222.2 84% 4.9%",
+    mutedForeground: "215.4 16.3% 46.9%",
+    cardForeground: "222.2 84% 4.9%",
   },
   {
     name: "Forest Green",
@@ -83,6 +89,9 @@ const defaultThemes: ColorTheme[] = [
     secondary: "138 76% 97%",
     accent: "138 76% 97%",
     background: "0 0% 100%",
+    foreground: "240 10% 3.9%",
+    mutedForeground: "240 3.8% 46.1%",
+    cardForeground: "240 10% 3.9%",
   },
   {
     name: "Sunset Orange",
@@ -90,6 +99,9 @@ const defaultThemes: ColorTheme[] = [
     secondary: "24 100% 97%",
     accent: "24 100% 97%",
     background: "0 0% 100%",
+    foreground: "20 14.3% 4.1%",
+    mutedForeground: "25 5.3% 44.7%",
+    cardForeground: "20 14.3% 4.1%",
   },
   {
     name: "Royal Purple",
@@ -97,6 +109,9 @@ const defaultThemes: ColorTheme[] = [
     secondary: "270 100% 98%",
     accent: "270 100% 98%",
     background: "0 0% 100%",
+    foreground: "224 71.4% 4.1%",
+    mutedForeground: "215.3 19.3% 34.5%",
+    cardForeground: "224 71.4% 4.1%",
   },
   {
     name: "Rose Pink",
@@ -104,6 +119,9 @@ const defaultThemes: ColorTheme[] = [
     secondary: "355 100% 97%",
     accent: "355 100% 97%",
     background: "0 0% 100%",
+    foreground: "240 10% 3.9%",
+    mutedForeground: "240 5% 64.9%",
+    cardForeground: "240 10% 3.9%",
   },
   {
     name: "Cyber Teal",
@@ -111,6 +129,29 @@ const defaultThemes: ColorTheme[] = [
     secondary: "180 100% 97%",
     accent: "180 100% 97%",
     background: "0 0% 100%",
+    foreground: "185 6% 8%",
+    mutedForeground: "184 5% 48%",
+    cardForeground: "185 6% 8%",
+  },
+  {
+    name: "Dark Ocean",
+    primary: "221.2 83.2% 53.3%",
+    secondary: "217.2 32.6% 17.5%",
+    accent: "217.2 32.6% 17.5%",
+    background: "222.2 84% 4.9%",
+    foreground: "210 40% 98%",
+    mutedForeground: "215 20.2% 65.1%",
+    cardForeground: "210 40% 98%",
+  },
+  {
+    name: "Dark Forest",
+    primary: "142.1 76.2% 36.3%",
+    secondary: "240 3.7% 15.9%",
+    accent: "240 3.7% 15.9%",
+    background: "240 10% 3.9%",
+    foreground: "0 0% 98%",
+    mutedForeground: "240 5% 64.9%",
+    cardForeground: "0 0% 98%",
   },
 ]
 
@@ -166,6 +207,9 @@ export default function Home() {
     root.style.setProperty("--secondary", theme.secondary)
     root.style.setProperty("--accent", theme.accent)
     root.style.setProperty("--background", theme.background)
+    root.style.setProperty("--foreground", theme.foreground)
+    root.style.setProperty("--muted-foreground", theme.mutedForeground)
+    root.style.setProperty("--card-foreground", theme.cardForeground)
   }
 
   const handleThemeChange = (theme: ColorTheme) => {
