@@ -95,43 +95,43 @@ const defaultThemes: ColorTheme[] = [
     shadow: "59 130 246",
   },
   {
-    name: "Sunset Fire",
-    description: "Vibrant oranges and reds for energetic problem solving",
-    primary: "249 115 22", // orange-500
-    secondary: "255 247 237", // orange-50
-    accent: "254 215 170", // orange-200
+    name: "Crimson Energy",
+    description: "Bold reds and crimsons for energetic problem solving",
+    primary: "220 38 127", // pink-700
+    secondary: "253 242 248", // pink-50
+    accent: "252 231 243", // pink-100
     background: "255 255 255", // white
     foreground: "15 23 42", // slate-900
     mutedForeground: "71 85 105", // slate-600
     cardForeground: "15 23 42", // slate-900
-    gradient: "linear-gradient(135deg, #f97316 0%, #ef4444 100%)",
-    shadow: "249 115 22",
+    gradient: "linear-gradient(135deg, #dc2626 0%, #be185d 100%)",
+    shadow: "220 38 127",
   },
   {
-    name: "Purple Galaxy",
-    description: "Deep purples and magentas for creative calculations",
-    primary: "147 51 234", // purple-600
-    secondary: "250 245 255", // purple-50
-    accent: "233 213 255", // purple-200
+    name: "Deep Space",
+    description: "Rich purples and indigos for creative calculations",
+    primary: "99 102 241", // indigo-500
+    secondary: "238 242 255", // indigo-50
+    accent: "224 231 255", // indigo-100
     background: "255 255 255", // white
     foreground: "15 23 42", // slate-900
     mutedForeground: "71 85 105", // slate-600
     cardForeground: "15 23 42", // slate-900
-    gradient: "linear-gradient(135deg, #9333ea 0%, #ec4899 100%)",
-    shadow: "147 51 234",
+    gradient: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+    shadow: "99 102 241",
   },
   {
-    name: "Forest Mint",
+    name: "Emerald Forest",
     description: "Fresh greens and emeralds for natural problem solving",
-    primary: "34 197 94", // green-500
-    secondary: "240 253 244", // green-50
-    accent: "187 247 208", // green-200
+    primary: "16 185 129", // emerald-500
+    secondary: "236 253 245", // emerald-50
+    accent: "209 250 229", // emerald-100
     background: "255 255 255", // white
     foreground: "15 23 42", // slate-900
     mutedForeground: "71 85 105", // slate-600
     cardForeground: "15 23 42", // slate-900
-    gradient: "linear-gradient(135deg, #22c55e 0%, #10b981 100%)",
-    shadow: "34 197 94",
+    gradient: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    shadow: "16 185 129",
   },
 ]
 

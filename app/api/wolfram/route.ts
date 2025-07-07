@@ -140,47 +140,72 @@ export async function POST(request: NextRequest) {
     const warnings: string[] = []
     const images: string[] = []
 
-    // Enhanced priority order for solution extraction
+    console.log(
+      "Available pods:",
+      pods.map((p: any) => ({ id: p.id, title: p.title })),
+    )
+
+    // Enhanced priority order for solution extraction - focus on Result pod first
     const solutionPodIds = [
-      "Solution",
       "Result",
+      "Solution",
       "DecimalApproximation",
       "ExactResult",
       "Value",
-      "AlternateForm",
       "Decimal form",
       "Exact result",
-      "Possible intermediate steps",
     ]
 
     // First, try to find solution in priority pods
     for (const podId of solutionPodIds) {
       const pod = pods.find(
         (p: any) =>
-          p.id === podId || (p.title && (p.title.toLowerCase().includes(podId.toLowerCase()) || p.title === podId)),
+          p.id === podId ||
+          (p.title && p.title.toLowerCase() === podId.toLowerCase()) ||
+          (p.title && p.title.toLowerCase().includes(podId.toLowerCase())),
       )
 
       if (pod && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
         const text = pod.subpods[0].plaintext.trim()
-        if (text && text.length > 0 && text !== query) {
+        if (text && text.length > 0 && text !== query && !text.toLowerCase().includes("input")) {
           solution = text
-          console.log(`Found solution in ${pod.title || podId} pod:`, solution)
+          console.log(`Found solution in ${pod.title || pod.id} pod:`, solution)
           break
         }
       }
     }
 
-    // If no solution found, try any non-input pod with meaningful content
+    // If no solution found in priority pods, look for any pod with "Result" in the title
+    if (!solution) {
+      const resultPod = pods.find((p: any) => p.title && p.title.toLowerCase().includes("result"))
+
+      if (resultPod && resultPod.subpods && resultPod.subpods[0] && resultPod.subpods[0].plaintext) {
+        const text = resultPod.subpods[0].plaintext.trim()
+        if (text && text.length > 0 && text !== query) {
+          solution = text
+          console.log(`Found solution in result pod:`, solution)
+        }
+      }
+    }
+
+    // If still no solution, try any non-input pod with meaningful content
     if (!solution) {
       for (const pod of pods) {
-        if (pod.id !== "Input" && pod.title !== "Input" && pod.subpods && pod.subpods[0] && pod.subpods[0].plaintext) {
+        if (
+          pod.id !== "Input" &&
+          pod.title !== "Input" &&
+          !pod.title?.toLowerCase().includes("input") &&
+          pod.subpods &&
+          pod.subpods[0] &&
+          pod.subpods[0].plaintext
+        ) {
           const text = pod.subpods[0].plaintext.trim()
           if (
             text &&
             text !== query &&
             !text.includes("Wolfram|Alpha") &&
             text.length > 0 &&
-            !text.toLowerCase().includes("input interpretation")
+            !text.toLowerCase().includes("interpretation")
           ) {
             solution = text
             console.log(`Found solution in ${pod.title || pod.id} pod:`, solution)

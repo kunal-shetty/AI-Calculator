@@ -28,9 +28,9 @@ interface ColorCustomizerProps {
 
 const themeIcons = {
   "Ocean Breeze": "🌊",
-  "Sunset Fire": "🔥",
-  "Purple Galaxy": "🌌",
-  "Forest Mint": "🌿",
+  "Crimson Energy": "🔥",
+  "Deep Space": "🌌",
+  "Emerald Forest": "🌿",
 }
 
 export function ColorCustomizer({ themes, currentTheme, onThemeChange, onClose }: ColorCustomizerProps) {
