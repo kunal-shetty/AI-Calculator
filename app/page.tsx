@@ -724,10 +724,10 @@ export default function Home() {
                   )}
 
                   {result.warnings && result.warnings.length > 0 && (
-                    <Alert className="border-amber-200 bg-amber-50 animate-shake glass-morphism">
-                      <AlertCircle className="h-4 w-4 text-amber-600 animate-pulse" />
+                    <Alert className="border-blue-200 bg-blue-50 animate-shake glass-morphism">
+                      <AlertCircle className="h-4 w-4 text-blue-600 animate-pulse" />
                       <AlertDescription>
-                        <div className="space-y-1 text-amber-800 text-xs sm:text-sm">
+                        <div className="space-y-1 text-blue-800 text-xs sm:text-sm">
                           {result.warnings.map((warning, index) => (
                             <div
                               key={index}
@@ -829,10 +829,15 @@ export default function Home() {
                                 e.stopPropagation()
                                 toggleFavorite(item)
                               }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-yellow-100 h-6 w-6 p-0 hover-lift"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover-lift"
+                              style={{
+                                backgroundColor: item.favorite ? "rgb(var(--accent))" : "transparent",
+                                color: item.favorite ? "rgb(var(--primary))" : "inherit",
+                              }}
                             >
                               <Star
-                                className={`h-3 w-3 ${item.favorite ? "fill-current text-yellow-500 animate-twinkle" : ""}`}
+                                className={`h-3 w-3 ${item.favorite ? "fill-current animate-twinkle" : ""}`}
+                                style={{ color: item.favorite ? "rgb(var(--primary))" : "inherit" }}
                               />
                             </Button>
                           </div>
