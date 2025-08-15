@@ -117,7 +117,7 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="result-showcase min-h-[60px] sm:min-h-[80px] flex items-center justify-center p-2 sm:p-4">
-            <div className="math-display text-center text-lg sm:text-2xl break-all">
+            <div className="math-display text-center text-lg sm:text-1xl break-all">
               {equation || "Build your equation..."}
             </div>
           </div>
