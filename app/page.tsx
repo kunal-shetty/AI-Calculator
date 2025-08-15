@@ -207,8 +207,8 @@ export default function MathCalculator() {
                 <Calculator className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-title font-bold">AI Math Calculator</h1>
-                <p className="text-caption">Advanced problem solving with AI assistance</p>
+                <h1 className="text-title font-bold">SolveAi</h1>
+                <p className="text-caption">Your smartest way to solve math</p>
               </div>
             </div>
 
@@ -267,7 +267,7 @@ export default function MathCalculator() {
 
                   <TabsContent value="text" className="space-y-4">
                     <Textarea
-                      placeholder="Enter your mathematical problem here... (e.g., 'Solve 2x + 5 = 11' or 'Find the derivative of x²')"
+                      placeholder="Enter your mathematical problem here..."
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       className="elegant-input min-h-[120px] resize-none"
