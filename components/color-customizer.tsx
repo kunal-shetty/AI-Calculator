@@ -190,53 +190,53 @@ export function ColorCustomizer({ onClose }: ColorCustomizerProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-5xl max-h-[85vh] overflow-hidden glass-card">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b border-border/50">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 pulse-glow">
-              <Palette className="h-6 w-6 text-primary" />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+      <Card className="w-full max-w-5xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden glass-card">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 sm:pb-6 border-b border-border/50">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+            <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 pulse-glow">
+              <Palette className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <div>
-              <CardTitle className="text-headline flex items-center gap-2">
-                Theme Gallery
-                <Sparkles className="h-5 w-5 text-primary" />
+            <div className="min-w-0">
+              <CardTitle className="text-lg sm:text-headline flex items-center gap-1.5 sm:gap-2">
+                <span className="truncate">Theme Gallery</span>
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
               </CardTitle>
-              <p className="text-caption mt-1">Choose your perfect mathematical workspace</p>
+              <p className="text-xs sm:text-caption mt-1 hidden sm:block">Choose your perfect mathematical workspace</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-10 w-10 rounded-xl">
-            <X className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl flex-shrink-0">
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </CardHeader>
 
-        <CardContent className="p-8 max-h-[calc(85vh-120px)] overflow-y-auto elegant-scrollbar">
-          <div className="space-y-8">
+        <CardContent className="p-3 sm:p-6 lg:p-8 max-h-[calc(95vh-100px)] sm:max-h-[calc(85vh-120px)] overflow-y-auto elegant-scrollbar">
+          <div className="space-y-4 sm:space-y-6 lg:space-y-8">
             {/* Dark Mode Toggle */}
             <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="section-title flex items-center gap-2">
-                  <Palette className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                  <Palette className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   Appearance Mode
                 </CardTitle>
-                <CardDescription>Switch between light and dark modes</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">Switch between light and dark modes</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
+              <CardContent className="pt-0">
+                <div className="flex items-center gap-2 sm:gap-4">
                   <Button
                     variant={!isDark ? "default" : "outline"}
                     onClick={() => !isDark || toggleDarkMode()}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1.5 sm:gap-2 text-sm h-9 sm:h-10 px-3 sm:px-4"
                   >
-                    <Sun className="h-4 w-4" />
+                    <Sun className="h-3 w-3 sm:h-4 sm:w-4" />
                     Light
                   </Button>
                   <Button
                     variant={isDark ? "default" : "outline"}
                     onClick={() => isDark || toggleDarkMode()}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1.5 sm:gap-2 text-sm h-9 sm:h-10 px-3 sm:px-4"
                   >
-                    <Moon className="h-4 w-4" />
+                    <Moon className="h-3 w-3 sm:h-4 sm:w-4" />
                     Dark
                   </Button>
                 </div>
@@ -244,13 +244,13 @@ export function ColorCustomizer({ onClose }: ColorCustomizerProps) {
             </Card>
 
             {/* Theme Selection */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <h3 className="section-title mb-2">Color Themes</h3>
-                <p className="text-caption">Choose from our carefully crafted color palettes</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">Color Themes</h3>
+                <p className="text-xs sm:text-caption">Choose from our carefully crafted color palettes</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                 {themes.map((theme) => {
                   const isSelected = currentTheme === theme.value
                   const colors = isDark ? theme.colors.dark : theme.colors.light
@@ -258,7 +258,7 @@ export function ColorCustomizer({ onClose }: ColorCustomizerProps) {
                   return (
                     <div
                       key={theme.name}
-                      className={`group relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                      className={`group relative p-3 sm:p-4 lg:p-6 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all duration-300 hover:scale-[1.01] sm:hover:scale-[1.02] ${
                         isSelected
                           ? "border-primary bg-primary/5 shadow-xl shadow-primary/20"
                           : "border-border/50 hover:border-primary/30 hover:shadow-lg"
@@ -272,35 +272,35 @@ export function ColorCustomizer({ onClose }: ColorCustomizerProps) {
                     >
                       {/* Selection Indicator */}
                       {isSelected && (
-                        <div className="absolute top-4 right-4 p-2 bg-primary rounded-full shadow-lg">
-                          <Check className="h-4 w-4 text-primary-foreground" />
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 p-1.5 sm:p-2 bg-primary rounded-full shadow-lg">
+                          <Check className="h-3 w-3 sm:h-4 sm:w-4 text-primary-foreground" />
                         </div>
                       )}
 
                       {/* Theme Header */}
-                      <div className="mb-4">
-                        <h3 className="text-title font-bold mb-2">{theme.name}</h3>
-                        <p className="text-caption">{theme.description}</p>
+                      <div className="mb-3 sm:mb-4">
+                        <h3 className="text-sm sm:text-base lg:text-lg font-bold mb-1 sm:mb-2 pr-8">{theme.name}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-tight">{theme.description}</p>
                       </div>
 
                       {/* Color Palette Display */}
-                      <div className="space-y-4 mb-6">
-                        <div className="flex gap-3">
+                      <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                        <div className="flex gap-2 sm:gap-3">
                           <div
-                            className="w-12 h-12 rounded-xl border-2 border-white/20 shadow-lg"
+                            className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg sm:rounded-xl border-2 border-white/20 shadow-lg"
                             style={{
                               background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primary}80 100%)`,
                             }}
                             title="Primary Gradient"
                           />
-                          <div className="flex flex-col gap-2">
+                          <div className="flex flex-col gap-1 sm:gap-2">
                             <div
-                              className="w-16 h-5 rounded-lg border border-white/20"
+                              className="w-12 h-3 sm:w-14 sm:h-4 lg:w-16 lg:h-5 rounded-md sm:rounded-lg border border-white/20"
                               style={{ backgroundColor: colors.secondary }}
                               title="Secondary"
                             />
                             <div
-                              className="w-16 h-5 rounded-lg border border-white/20"
+                              className="w-12 h-3 sm:w-14 sm:h-4 lg:w-16 lg:h-5 rounded-md sm:rounded-lg border border-white/20"
                               style={{ backgroundColor: colors.accent }}
                               title="Accent"
                             />

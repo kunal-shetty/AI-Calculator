@@ -64,42 +64,43 @@ export function HistoryPanel({ history, onClose, onSelectProblem, onClearHistory
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden glass-card">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b border-border/50">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 pulse-glow">
-              <Clock className="h-6 w-6 text-primary" />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+      <Card className="w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden glass-card">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 sm:pb-6 border-b border-border/50">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+            <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 pulse-glow">
+              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             </div>
-            <div>
-              <CardTitle className="text-headline">Calculation History</CardTitle>
-              <CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="text-lg sm:text-headline truncate">Calculation History</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 {history.length} problem{history.length !== 1 ? "s" : ""} solved
               </CardDescription>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-10 w-10 rounded-xl">
-            <X className="h-5 w-5" />
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl flex-shrink-0">
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </CardHeader>
 
-        <CardContent className="p-6">
+        <CardContent className="p-3 sm:p-6">
           {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 placeholder="Search problems and solutions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 elegant-input"
+                className="pl-8 sm:pl-10 elegant-input text-sm h-9 sm:h-10"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 sm:gap-2 overflow-x-auto">
               <Button
                 variant={selectedFilter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedFilter("all")}
+                className="text-xs h-8 px-3 whitespace-nowrap"
               >
                 All
               </Button>
@@ -107,6 +108,7 @@ export function HistoryPanel({ history, onClose, onSelectProblem, onClearHistory
                 variant={selectedFilter === "today" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedFilter("today")}
+                className="text-xs h-8 px-3 whitespace-nowrap"
               >
                 Today
               </Button>
@@ -114,6 +116,7 @@ export function HistoryPanel({ history, onClose, onSelectProblem, onClearHistory
                 variant={selectedFilter === "week" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedFilter("week")}
+                className="text-xs h-8 px-3 whitespace-nowrap"
               >
                 This Week
               </Button>
@@ -121,73 +124,81 @@ export function HistoryPanel({ history, onClose, onSelectProblem, onClearHistory
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={exportHistory} disabled={history.length === 0}>
-                <Download className="h-4 w-4 mr-2" />
-                Export
+          <div className="flex justify-between items-center mb-4 sm:mb-6 gap-2">
+            <div className="flex gap-1.5 sm:gap-2">
+              <Button variant="outline" size="sm" onClick={exportHistory} disabled={history.length === 0} className="text-xs h-8 px-2 sm:px-3">
+                <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden xs:inline">Export</span>
               </Button>
             </div>
-            <Button variant="destructive" size="sm" onClick={onClearHistory} disabled={history.length === 0}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear All
+            <Button variant="destructive" size="sm" onClick={onClearHistory} disabled={history.length === 0} className="text-xs h-8 px-2 sm:px-3">
+              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Clear All</span>
+              <span className="xs:hidden">Clear</span>
             </Button>
           </div>
 
           {/* History List */}
-          <ScrollArea className="h-[50vh] elegant-scrollbar">
+          <ScrollArea className="h-[45vh] sm:h-[50vh] elegant-scrollbar">
             {filteredHistory.length === 0 ? (
-              <div className="text-center py-12">
-                <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-title mb-2">
+              <div className="text-center py-8 sm:py-12">
+                <Clock className="h-8 w-8 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-base sm:text-title mb-2">
                   {searchTerm ? "No matching problems found" : "No calculation history"}
                 </h3>
-                <p className="text-caption">
+                <p className="text-xs sm:text-caption">
                   {searchTerm
                     ? "Try adjusting your search terms or filters"
                     : "Start solving problems to see your history here"}
                 </p>
               </div>
             ) : (
-              <div className="space-y-4 pr-4">
+              <div className="space-y-3 sm:space-y-4 pr-2 sm:pr-4">
                 {filteredHistory.map((item, index) => (
                   <Card
                     key={index}
                     className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.01] border-border/50"
                     onClick={() => onSelectProblem(item)}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-4">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-start justify-between gap-2 sm:gap-4">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2 mb-2 flex-wrap">
                             <Badge variant="secondary" className="text-xs">
                               {item.method}
                             </Badge>
-                            <span className="text-xs text-muted-foreground">{item.timestamp.toLocaleString()}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {item.timestamp.toLocaleString([], { 
+                                month: 'short', 
+                                day: 'numeric', 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </span>
                           </div>
 
                           <div className="space-y-2">
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground mb-1">Problem:</p>
-                              <p className="text-sm font-mono bg-muted/50 p-2 rounded-lg">{item.input}</p>
+                              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Problem:</p>
+                              <p className="text-xs sm:text-sm font-mono bg-muted/50 p-2 rounded-lg break-words">{item.input}</p>
                             </div>
 
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground mb-1">Solution:</p>
-                              <p className="text-sm font-mono bg-primary/5 p-2 rounded-lg text-primary">
+                              <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">Solution:</p>
+                              <p className="text-xs sm:text-sm font-mono bg-primary/5 p-2 rounded-lg text-primary break-words">
                                 {item.result}
                               </p>
                             </div>
                           </div>
 
                           {item.steps && item.steps.length > 0 && (
-                            <div className="mt-3">
-                              <p className="text-xs text-muted-foreground mb-2">
+                            <div className="mt-2 sm:mt-3">
+                              <p className="text-xs text-muted-foreground mb-1 sm:mb-2">
                                 {item.steps.length} solution step{item.steps.length !== 1 ? "s" : ""}
                               </p>
                               <div className="flex gap-1">
                                 {item.steps.slice(0, 3).map((_, stepIndex) => (
-                                  <div key={stepIndex} className="w-2 h-2 bg-primary/30 rounded-full" />
+                                  <div key={stepIndex} className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-primary/30 rounded-full" />
                                 ))}
                                 {item.steps.length > 3 && (
                                   <span className="text-xs text-muted-foreground ml-1">
@@ -207,11 +218,11 @@ export function HistoryPanel({ history, onClose, onSelectProblem, onClearHistory
           </ScrollArea>
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
-            <p className="text-caption">
+          <div className="flex items-center justify-between mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-border/50 gap-2">
+            <p className="text-xs sm:text-caption">
               Showing {filteredHistory.length} of {history.length} problems
             </p>
-            <Button onClick={onClose} className="gradient-button">
+            <Button onClick={onClose} className="gradient-button h-8 sm:h-10 text-sm px-4 sm:px-6">
               Close
             </Button>
           </div>

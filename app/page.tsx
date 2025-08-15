@@ -200,40 +200,42 @@ export default function MathCalculator() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 pulse-glow">
-                <Calculator className="h-6 w-6 text-primary" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 pulse-glow">
+                <Calculator className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
-              <div>
-                <h1 className="text-title font-bold">AI Math Calculator</h1>
-                <p className="text-caption">Advanced problem solving with AI assistance</p>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-title font-bold truncate">AI Math Calculator</h1>
+                <p className="text-xs sm:text-caption hidden sm:block">Advanced problem solving with AI assistance</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={() => setShowHistory(true)} className="relative">
-                <History className="h-5 w-5" />
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Button variant="ghost" size="icon" onClick={() => setShowHistory(true)} className="relative h-8 w-8 sm:h-10 sm:w-10">
+                <History className="h-4 w-4 sm:h-5 sm:w-5" />
                 {history.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
+                  <Badge className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-4 w-4 sm:h-5 sm:w-5 p-0 text-xs">
                     {history.length > 99 ? "99+" : history.length}
                   </Badge>
                 )}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setShowCustomizer(true)}>
-                <Palette className="h-5 w-5" />
+              <Button variant="ghost" size="icon" onClick={() => setShowCustomizer(true)} className="h-8 w-8 sm:h-10 sm:w-10">
+                <Palette className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
-              <ThemeToggle />
+              <div className="scale-90 sm:scale-100">
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Main Input Section */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <Card className="glass-card fade-in-up">
               <CardHeader>
                 <CardTitle className="section-title flex items-center gap-2">
@@ -246,31 +248,34 @@ export default function MathCalculator() {
               </CardHeader>
               <CardContent>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 mb-6">
-                    <TabsTrigger value="text" className="flex items-center gap-2">
-                      <BookOpen className="h-4 w-4" />
-                      Text
+                  <TabsList className="grid w-full grid-cols-3 mb-4 sm:mb-6 h-auto">
+                    <TabsTrigger value="text" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+                      <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden xs:inline">Text</span>
+                      <span className="xs:hidden">T</span>
                     </TabsTrigger>
-                    <TabsTrigger value="voice" className="flex items-center gap-2">
-                      <Mic className="h-4 w-4" />
-                      Voice
+                    <TabsTrigger value="voice" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+                      <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden xs:inline">Voice</span>
+                      <span className="xs:hidden">V</span>
                     </TabsTrigger>
                     {/* <TabsTrigger value="image" className="flex items-center gap-2">
                       <Camera className="h-4 w-4" />
                       Image
                     </TabsTrigger> */}
-                    <TabsTrigger value="builder" className="flex items-center gap-2">
-                      <Settings className="h-4 w-4" />
-                      Builder
+                    <TabsTrigger value="builder" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+                      <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden xs:inline">Builder</span>
+                      <span className="xs:hidden">B</span>
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="text" className="space-y-4">
+                  <TabsContent value="text" className="space-y-3 sm:space-y-4">
                     <Textarea
                       placeholder="Enter your mathematical problem here... (e.g., 'Solve 2x + 5 = 11' or 'Find the derivative of x²')"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      className="elegant-input min-h-[120px] resize-none"
+                      className="elegant-input min-h-[100px] sm:min-h-[120px] resize-none text-sm sm:text-base"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
                           e.preventDefault()
@@ -278,16 +283,16 @@ export default function MathCalculator() {
                         }
                       }}
                     />
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {exampleProblems.map((problem, index) => (
                         <Button
                           key={index}
                           variant="outline"
                           size="sm"
                           onClick={() => setInput(problem)}
-                          className="text-xs"
+                          className="text-xs px-2 py-1 sm:px-3 sm:py-2 h-auto min-h-[32px] sm:min-h-[36px] leading-tight"
                         >
-                          {problem}
+                          <span className="line-clamp-2">{problem}</span>
                         </Button>
                       ))}
                     </div>
@@ -340,16 +345,16 @@ export default function MathCalculator() {
                   </Alert>
                 )}
 
-                <div className="flex gap-3 mt-6">
+                <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
                   <Button
                     onClick={solveProblem}
                     disabled={!input.trim() || isLoading}
-                    className="gradient-button flex-1"
+                    className="gradient-button flex-1 h-10 sm:h-11 text-sm sm:text-base"
                   >
-                    <Zap className="h-4 w-4 mr-2" />
+                    <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     {isLoading ? "Solving..." : "Solve Problem"}
                   </Button>
-                  <Button variant="outline" onClick={clearAll} disabled={isLoading}>
+                  <Button variant="outline" onClick={clearAll} disabled={isLoading} className="h-10 sm:h-11 px-3 sm:px-4 text-sm sm:text-base">
                     Clear
                   </Button>
                 </div>
@@ -359,26 +364,26 @@ export default function MathCalculator() {
             {/* Results Section */}
             {result && (
               <Card className="glass-card fade-in-up">
-                <CardHeader>
-                  <CardTitle className="section-title flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
+                <CardHeader className="pb-4 sm:pb-6">
+                  <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
                     Solution
                   </CardTitle>
-                  <CardDescription className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+                  <CardDescription className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                     Solved {result.timestamp.toLocaleTimeString()}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6">
                   <div className="result-showcase">
                     <div className="math-display">{result.result}</div>
                   </div>
 
                   {result.steps && result.steps.length > 0 && (
-                    <div className="space-y-4">
-                      <h3 className="section-title">Solution Steps</h3>
-                      <ScrollArea className="max-h-96 elegant-scrollbar">
-                        <div className="space-y-3 pr-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-base sm:text-lg font-semibold">Solution Steps</h3>
+                      <ScrollArea className="max-h-80 sm:max-h-96 elegant-scrollbar">
+                        <div className="space-y-2 sm:space-y-3 pr-2 sm:pr-4">
                           {result.steps.map((step, index) => (
                             <div key={index} className="step-card">
                               <div className="flex items-start gap-3">
@@ -407,7 +412,7 @@ export default function MathCalculator() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Quick Stats */}
             <Card className="glass-card">
               <CardHeader>
