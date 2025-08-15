@@ -1,267 +1,238 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
-  Calculator,
   Plus,
   Minus,
-  X,
+  ImagePlusIcon as MultiplyIcon,
   Divide,
-  Square,
-  SquareIcon as SquareRoot,
-  Sigma,
+  Equal,
+  RotateCcw,
+  Copy,
+  Parentheses,
+  Superscript,
+  Radical,
   Pi,
   Infinity,
-  ActivityIcon as Function,
-  Parentheses,
-  Equal,
-  PlusIcon as GreaterThan,
-  MinusIcon as LessThan,
-  Trash2,
-  Copy,
 } from "lucide-react"
 
 interface EquationBuilderProps {
-  onEquationBuilt: (equation: string) => void
+  onResult: (equation: string) => void
 }
 
-export function EquationBuilder({ onEquationBuilt }: EquationBuilderProps) {
+export function EquationBuilder({ onResult }: EquationBuilderProps) {
   const [equation, setEquation] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("basic")
+  const [cursor, setCursor] = useState(0)
 
-  const basicOperators = [
-    { symbol: "+", label: "Add", icon: Plus },
-    { symbol: "-", label: "Subtract", icon: Minus },
-    { symbol: "*", label: "Multiply", icon: X },
-    { symbol: "/", label: "Divide", icon: Divide },
-    { symbol: "^", label: "Power", icon: Square },
-    { symbol: "sqrt()", label: "Square Root", icon: SquareRoot },
-    { symbol: "(", label: "Open Parenthesis", icon: Parentheses },
-    { symbol: ")", label: "Close Parenthesis", icon: Parentheses },
-    { symbol: "=", label: "Equals", icon: Equal },
-    { symbol: ">", label: "Greater Than", icon: GreaterThan },
-    { symbol: "<", label: "Less Than", icon: LessThan },
-  ]
-
-  const advancedFunctions = [
-    { symbol: "sin()", label: "Sine" },
-    { symbol: "cos()", label: "Cosine" },
-    { symbol: "tan()", label: "Tangent" },
-    { symbol: "log()", label: "Logarithm" },
-    { symbol: "ln()", label: "Natural Log" },
-    { symbol: "exp()", label: "Exponential" },
-    { symbol: "abs()", label: "Absolute Value" },
-    { symbol: "floor()", label: "Floor" },
-    { symbol: "ceil()", label: "Ceiling" },
-    { symbol: "round()", label: "Round" },
-  ]
-
-  const constants = [
-    { symbol: "pi", label: "Pi (π)", icon: Pi },
-    { symbol: "e", label: "Euler's Number" },
-    { symbol: "infinity", label: "Infinity", icon: Infinity },
-    { symbol: "i", label: "Imaginary Unit" },
-  ]
-
-  const calculus = [
-    { symbol: "integrate ", label: "Integral", icon: Sigma },
-    { symbol: "derivative ", label: "Derivative" },
-    { symbol: "limit ", label: "Limit" },
-    { symbol: "sum ", label: "Summation", icon: Sigma },
-    { symbol: "product ", label: "Product" },
-  ]
-
-  const algebra = [
-    { symbol: "solve ", label: "Solve" },
-    { symbol: "factor ", label: "Factor" },
-    { symbol: "expand ", label: "Expand" },
-    { symbol: "simplify ", label: "Simplify" },
-    { symbol: "substitute ", label: "Substitute" },
-  ]
-
-  const matrices = [
-    { symbol: "[[", label: "Start Matrix" },
-    { symbol: "]]", label: "End Matrix" },
-    { symbol: ",", label: "Comma" },
-    { symbol: ";", label: "Semicolon" },
-    { symbol: "det()", label: "Determinant" },
-    { symbol: "inverse()", label: "Inverse" },
-    { symbol: "transpose()", label: "Transpose" },
-  ]
-
-  const addToEquation = (symbol: string) => {
-    setEquation((prev) => prev + symbol)
+  const insertAtCursor = (text: string) => {
+    const newEquation = equation.slice(0, cursor) + text + equation.slice(cursor)
+    setEquation(newEquation)
+    setCursor(cursor + text.length)
   }
 
   const clearEquation = () => {
     setEquation("")
+    setCursor(0)
   }
 
   const copyEquation = () => {
     navigator.clipboard.writeText(equation)
   }
 
-  const buildEquation = () => {
-    if (equation.trim()) {
-      onEquationBuilt(equation)
-    }
-  }
-
-  const categories = [
-    { id: "basic", label: "Basic", items: basicOperators },
-    { id: "functions", label: "Functions", items: advancedFunctions },
-    { id: "constants", label: "Constants", items: constants },
-    { id: "calculus", label: "Calculus", items: calculus },
-    { id: "algebra", label: "Algebra", items: algebra },
-    { id: "matrices", label: "Matrices", items: matrices },
+  const basicOperators = [
+    { symbol: "+", label: "Add", icon: Plus },
+    { symbol: "-", label: "Subtract", icon: Minus },
+    { symbol: "*", label: "Multiply", icon: MultiplyIcon },
+    { symbol: "/", label: "Divide", icon: Divide },
+    { symbol: "=", label: "Equals", icon: Equal },
+    { symbol: "(", label: "Open Parenthesis", icon: Parentheses },
+    { symbol: ")", label: "Close Parenthesis", icon: Parentheses },
   ]
 
+  const advancedOperators = [
+    { symbol: "^", label: "Power", icon: Superscript },
+    { symbol: "sqrt(", label: "Square Root", icon: Radical },
+    { symbol: "log(", label: "Logarithm", text: "log" },
+    { symbol: "ln(", label: "Natural Log", text: "ln" },
+    { symbol: "sin(", label: "Sine", text: "sin" },
+    { symbol: "cos(", label: "Cosine", text: "cos" },
+    { symbol: "tan(", label: "Tangent", text: "tan" },
+    { symbol: "π", label: "Pi", icon: Pi },
+    { symbol: "∞", label: "Infinity", icon: Infinity },
+  ]
+
+  const numbers = ["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", ".", "x", "y", "z"]
+
   const commonEquations = [
-    { name: "Quadratic Formula", equation: "solve a*x^2 + b*x + c = 0" },
-    { name: "Pythagorean Theorem", equation: "sqrt(a^2 + b^2)" },
-    { name: "Area of Circle", equation: "pi * r^2" },
-    { name: "Derivative of x^n", equation: "derivative x^n" },
-    { name: "Integral of x^n", equation: "integrate x^n dx" },
-    { name: "Sine Wave", equation: "sin(x)" },
-    { name: "Exponential Growth", equation: "a * e^(b*x)" },
-    { name: "Normal Distribution", equation: "1/sqrt(2*pi) * e^(-x^2/2)" },
+    { name: "Quadratic", template: "ax² + bx + c = 0" },
+    { name: "Linear", template: "mx + b = y" },
+    { name: "Circle", template: "(x-h)² + (y-k)² = r²" },
+    { name: "Derivative", template: "d/dx(f(x))" },
+    { name: "Integral", template: "∫f(x)dx" },
+    { name: "Limit", template: "lim(x→a) f(x)" },
   ]
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Function className="h-5 w-5" />
-          Equation Builder
-        </CardTitle>
-        <CardDescription>Build mathematical equations using visual tools and symbols</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Equation Display */}
-        <div className="space-y-2">
-          <Label htmlFor="equation-display">Current Equation</Label>
-          <div className="relative">
-            <Input
-              id="equation-display"
-              value={equation}
-              onChange={(e) => setEquation(e.target.value)}
-              placeholder="Your equation will appear here..."
-              className="font-mono text-lg pr-20"
-            />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-              <Button variant="ghost" size="sm" onClick={copyEquation} disabled={!equation}>
-                <Copy className="h-4 w-4" />
+    <div className="space-y-6">
+      {/* Equation Display */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="section-title">Equation Builder</CardTitle>
+          <CardDescription>Build mathematical expressions visually</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Equation Preview */}
+            <div className="result-showcase min-h-[80px] flex items-center justify-center">
+              {equation ? (
+                <div className="math-display text-2xl">{equation}</div>
+              ) : (
+                <p className="text-muted-foreground">Start building your equation...</p>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2 justify-center">
+              <Button variant="outline" size="sm" onClick={clearEquation} disabled={!equation}>
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Clear
               </Button>
-              <Button variant="ghost" size="sm" onClick={clearEquation} disabled={!equation}>
-                <Trash2 className="h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={copyEquation} disabled={!equation}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy
+              </Button>
+              <Button onClick={() => onResult(equation)} disabled={!equation} className="gradient-button">
+                Use Equation
               </Button>
             </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
-            {categories.map((category) => (
-              <TabsTrigger key={category.id} value={category.id} className="text-xs">
-                {category.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          {categories.map((category) => (
-            <TabsContent key={category.id} value={category.id} className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                {category.items.map((item, index) => {
-                  const IconComponent = item.icon
-                  return (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addToEquation(item.symbol)}
-                      className="flex items-center gap-2 h-auto p-3 text-left justify-start"
-                    >
-                      {IconComponent && <IconComponent className="h-4 w-4 flex-shrink-0" />}
-                      <div className="min-w-0">
-                        <div className="font-mono text-sm truncate">{item.symbol}</div>
-                        <div className="text-xs text-muted-foreground truncate">{item.label}</div>
-                      </div>
-                    </Button>
-                  )
-                })}
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
-
-        {/* Common Equations */}
-        <div className="space-y-2">
-          <Label>Common Equations</Label>
-          <ScrollArea className="h-32">
-            <div className="space-y-2">
-              {commonEquations.map((eq, index) => (
-                <div key={index} className="flex items-center justify-between p-2 border rounded-lg hover:bg-muted/50">
-                  <div>
-                    <div className="font-medium text-sm">{eq.name}</div>
-                    <div className="font-mono text-xs text-muted-foreground">{eq.equation}</div>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setEquation(eq.equation)}>
-                    Use
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
-
-        {/* Variables Helper */}
-        <div className="space-y-2">
-          <Label>Quick Variables</Label>
-          <div className="flex flex-wrap gap-2">
-            {["x", "y", "z", "a", "b", "c", "n", "t", "θ", "α", "β", "γ"].map((variable) => (
-              <Badge
-                key={variable}
-                variant="secondary"
-                className="cursor-pointer hover:bg-primary/20 transition-colors"
-                onClick={() => addToEquation(variable)}
-              >
-                {variable}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {/* Numbers Helper */}
-        <div className="space-y-2">
-          <Label>Number Pad</Label>
-          <div className="grid grid-cols-4 gap-2 max-w-xs">
-            {[7, 8, 9, "/", 4, 5, 6, "*", 1, 2, 3, "-", 0, ".", "=", "+"].map((num) => (
+      {/* Quick Templates */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="section-title">Quick Templates</CardTitle>
+          <CardDescription>Start with common equation types</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {commonEquations.map((eq, index) => (
               <Button
-                key={num}
+                key={index}
                 variant="outline"
                 size="sm"
-                onClick={() => addToEquation(num.toString())}
-                className="aspect-square"
+                onClick={() => {
+                  setEquation(eq.template)
+                  setCursor(eq.template.length)
+                }}
+                className="text-xs h-auto py-2 px-3"
               >
-                {num}
+                <div className="text-center">
+                  <div className="font-semibold">{eq.name}</div>
+                  <div className="text-xs text-muted-foreground font-mono mt-1">{eq.template}</div>
+                </div>
               </Button>
             ))}
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Build Button */}
-        <Button onClick={buildEquation} disabled={!equation.trim()} className="w-full">
-          <Calculator className="h-4 w-4 mr-2" />
-          Build Equation
-        </Button>
-      </CardContent>
-    </Card>
+      {/* Input Panels */}
+      <div className="grid md:grid-cols-3 gap-4">
+        {/* Numbers and Variables */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="section-title text-sm">Numbers & Variables</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-2">
+              {numbers.map((num, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertAtCursor(num)}
+                  className="h-10 font-mono"
+                >
+                  {num}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Basic Operators */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="section-title text-sm">Basic Operators</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2">
+              {basicOperators.map((op, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertAtCursor(op.symbol)}
+                  className="h-10 flex items-center gap-2"
+                >
+                  <op.icon className="h-4 w-4" />
+                  <span className="font-mono">{op.symbol}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Advanced Functions */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="section-title text-sm">Functions & Symbols</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-48">
+              <div className="grid grid-cols-1 gap-2 pr-2">
+                {advancedOperators.map((op, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertAtCursor(op.symbol)}
+                    className="h-10 flex items-center gap-2 justify-start"
+                  >
+                    {op.icon ? <op.icon className="h-4 w-4" /> : null}
+                    <span className="font-mono text-xs">{op.text || op.symbol}</span>
+                    <Badge variant="secondary" className="ml-auto text-xs">
+                      {op.label}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Help Text */}
+      <Card className="glass-card">
+        <CardContent className="pt-6">
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              <strong>Tip:</strong> Use the visual builder above or type directly in the text input tab
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
+              <span>• Click buttons to insert symbols</span>
+              <span>• Use templates for common equations</span>
+              <span>• Copy equations to clipboard</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

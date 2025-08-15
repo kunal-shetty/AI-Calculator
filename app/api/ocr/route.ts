@@ -3,36 +3,41 @@ import { type NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const file = formData.get("file") as File
+    const image = formData.get("image") as File
 
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 })
+    if (!image) {
+      return NextResponse.json({ error: "No image provided" }, { status: 400 })
     }
 
-    // For now, return a mock response
-    // In production, you would integrate with OCR services like:
+    // Convert image to base64
+    const bytes = await image.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    const base64Image = buffer.toString("base64")
+
+    // For now, return a mock response since we don't have OCR service configured
+    // In a real implementation, you would integrate with services like:
     // - Google Cloud Vision API
-    // - Azure Computer Vision
     // - AWS Textract
+    // - Azure Computer Vision
     // - Tesseract.js for client-side OCR
 
-    const mockEquations = [
-      "x^2 + 5x + 6 = 0",
-      "integrate sin(x) dx",
-      "derivative of x^3 + 2x^2",
-      "solve 2x + 3y = 7",
-      "factor x^2 - 9",
+    const mockMathProblems = [
+      "2x + 5 = 11",
+      "x² - 4x + 4 = 0",
+      "∫ sin(x) dx",
+      "lim(x→0) sin(x)/x",
+      "dy/dx = 3x² + 2x + 1",
     ]
 
-    const randomEquation = mockEquations[Math.floor(Math.random() * mockEquations.length)]
+    const randomProblem = mockMathProblems[Math.floor(Math.random() * mockMathProblems.length)]
 
     // Simulate processing time
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
     return NextResponse.json({
-      equation: randomEquation,
+      text: randomProblem,
       confidence: 0.95,
-      message: "Equation extracted successfully (demo mode)",
+      source: "ocr",
     })
   } catch (error) {
     console.error("OCR processing error:", error)

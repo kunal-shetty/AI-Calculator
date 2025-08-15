@@ -1,154 +1,300 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Mic, MicOff, Volume2 } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Mic, Volume2, Square, RotateCcw, AlertCircle, CheckCircle, Waves } from "lucide-react"
 
 interface VoiceInputProps {
-  onTranscript: (transcript: string) => void
+  onResult: (transcript: string) => void
 }
 
-export function VoiceInput({ onTranscript }: VoiceInputProps) {
+export function VoiceInput({ onResult }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState("")
-  const [recognition, setRecognition] = useState<any | null>(null)
+  const [confidence, setConfidence] = useState(0)
+  const [error, setError] = useState("")
+  const [isSupported, setIsSupported] = useState(true)
+  const [audioLevel, setAudioLevel] = useState(0)
+
+  const recognitionRef = useRef<any>(null)
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const analyserRef = useRef<AnalyserNode | null>(null)
+  const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null)
+  const animationRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
-      const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition
-      const recognition = new SpeechRecognition()
-
-      recognition.continuous = false
-      recognition.interimResults = true
-      recognition.lang = "en-US"
-
-      recognition.onstart = () => {
-        setIsListening(true)
+    // Check if speech recognition is supported
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition
+      if (!SpeechRecognition) {
+        setIsSupported(false)
+        setError("Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.")
+        return
       }
 
-      recognition.onresult = (event) => {
+      // Initialize speech recognition
+      recognitionRef.current = new SpeechRecognition()
+      recognitionRef.current.continuous = true
+      recognitionRef.current.interimResults = true
+      recognitionRef.current.lang = "en-US"
+
+      recognitionRef.current.onresult = (event: any) => {
         let finalTranscript = ""
         let interimTranscript = ""
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript
+          const confidence = event.results[i][0].confidence
+
           if (event.results[i].isFinal) {
             finalTranscript += transcript
+            setConfidence(confidence * 100)
           } else {
             interimTranscript += transcript
           }
         }
 
-        const fullTranscript = finalTranscript || interimTranscript
-        setTranscript(fullTranscript)
+        setTranscript(finalTranscript || interimTranscript)
+      }
 
-        if (finalTranscript) {
-          onTranscript(finalTranscript)
+      recognitionRef.current.onerror = (event: any) => {
+        setError(`Speech recognition error: ${event.error}`)
+        setIsListening(false)
+      }
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false)
+        stopAudioVisualization()
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+      stopAudioVisualization()
+    }
+  }, [])
+
+  const startAudioVisualization = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      audioContextRef.current = new AudioContext()
+      analyserRef.current = audioContextRef.current.createAnalyser()
+      microphoneRef.current = audioContextRef.current.createMediaStreamSource(stream)
+
+      microphoneRef.current.connect(analyserRef.current)
+      analyserRef.current.fftSize = 256
+
+      const bufferLength = analyserRef.current.frequencyBinCount
+      const dataArray = new Uint8Array(bufferLength)
+
+      const updateAudioLevel = () => {
+        if (analyserRef.current) {
+          analyserRef.current.getByteFrequencyData(dataArray)
+          const average = dataArray.reduce((a, b) => a + b) / bufferLength
+          setAudioLevel(average)
+          animationRef.current = requestAnimationFrame(updateAudioLevel)
         }
       }
 
-      recognition.onend = () => {
-        setIsListening(false)
-      }
-
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error)
-        setIsListening(false)
-      }
-
-      setRecognition(recognition)
+      updateAudioLevel()
+    } catch (err) {
+      console.error("Error accessing microphone:", err)
     }
-  }, [onTranscript])
+  }
+
+  const stopAudioVisualization = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close()
+    }
+    setAudioLevel(0)
+  }
 
   const startListening = () => {
-    if (recognition) {
-      setTranscript("")
-      recognition.start()
-    }
+    if (!isSupported || !recognitionRef.current) return
+
+    setError("")
+    setTranscript("")
+    setConfidence(0)
+    setIsListening(true)
+
+    recognitionRef.current.start()
+    startAudioVisualization()
   }
 
   const stopListening = () => {
-    if (recognition) {
-      recognition.stop()
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
+    }
+    setIsListening(false)
+    stopAudioVisualization()
+  }
+
+  const clearTranscript = () => {
+    setTranscript("")
+    setConfidence(0)
+    setError("")
+  }
+
+  const useTranscript = () => {
+    if (transcript.trim()) {
+      onResult(transcript.trim())
     }
   }
 
-  const speakInstructions = () => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(
-        "Speak your math problem clearly. For example, say 'solve x squared plus 5x plus 6 equals 0' or 'integrate sine of x'",
-      )
-      speechSynthesis.speak(utterance)
-    }
-  }
+  const mathExamples = [
+    "Solve two x plus five equals eleven",
+    "Find the derivative of x squared plus three x",
+    "What is the integral of sine x",
+    "Factor x squared minus five x plus six",
+    "Calculate the limit as x approaches zero",
+  ]
 
-  if (!recognition) {
+  if (!isSupported) {
     return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p className="text-muted-foreground">
-            Voice input is not supported in your browser. Please use Chrome or Safari.
-          </p>
-        </CardContent>
-      </Card>
+      <Alert className="border-destructive/50 bg-destructive/5">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari for voice input
+          functionality.
+        </AlertDescription>
+      </Alert>
     )
   }
 
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center gap-4">
-            <Button
-              onClick={isListening ? stopListening : startListening}
-              variant={isListening ? "destructive" : "default"}
-              size="lg"
-              className="w-32"
-            >
-              {isListening ? (
-                <>
-                  <MicOff className="h-5 w-5 mr-2" />
-                  Stop
-                </>
-              ) : (
-                <>
-                  <Mic className="h-5 w-5 mr-2" />
-                  Start
-                </>
+    <div className="space-y-6">
+      {/* Voice Control */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="section-title flex items-center gap-2">
+            <Mic className="h-5 w-5 text-primary" />
+            Voice Input
+          </CardTitle>
+          <CardDescription>Speak your mathematical problem naturally</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Microphone Visualization */}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative">
+              <Button
+                size="lg"
+                onClick={isListening ? stopListening : startListening}
+                className={`w-20 h-20 rounded-full transition-all duration-300 ${
+                  isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : "gradient-button"
+                }`}
+              >
+                {isListening ? <Square className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
+              </Button>
+
+              {/* Audio Level Visualization */}
+              {isListening && (
+                <div
+                  className="absolute inset-0 rounded-full border-4 border-red-500/30 animate-ping"
+                  style={{
+                    transform: `scale(${1 + audioLevel / 100})`,
+                    opacity: Math.max(0.3, audioLevel / 255),
+                  }}
+                />
               )}
-            </Button>
-            <Button onClick={speakInstructions} variant="outline" size="lg">
-              <Volume2 className="h-5 w-5 mr-2" />
-              Help
-            </Button>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm font-medium">{isListening ? "Listening..." : "Click to start speaking"}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {isListening ? "Speak clearly and naturally" : "Make sure your microphone is enabled"}
+              </p>
+            </div>
+
+            {/* Audio Level Indicator */}
+            {isListening && (
+              <div className="w-full max-w-xs">
+                <div className="flex items-center gap-2 mb-2">
+                  <Volume2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Audio Level</span>
+                </div>
+                <Progress value={audioLevel} className="h-2" />
+              </div>
+            )}
           </div>
 
-          {isListening && (
-            <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-muted-foreground">Listening...</span>
-            </div>
-          )}
-
+          {/* Transcript Display */}
           {transcript && (
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground mb-2">You said:</p>
-              <div className="p-3 bg-muted rounded-lg text-left">{transcript}</div>
+            <div className="result-showcase">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="section-title">Transcript</h3>
+                  {confidence > 0 && (
+                    <Badge variant={confidence > 80 ? "default" : confidence > 60 ? "secondary" : "destructive"}>
+                      {Math.round(confidence)}% confidence
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-lg font-mono">{transcript}</p>
+              </div>
             </div>
           )}
 
-          <div className="text-xs text-muted-foreground">
-            <p>Tips for better recognition:</p>
-            <ul className="list-disc list-inside mt-1 space-y-1">
-              <li>Speak clearly and at a normal pace</li>
-              <li>Say "x squared" instead of "x²"</li>
-              <li>Say "equals" instead of "="</li>
-              <li>Say "plus" and "minus" for operations</li>
+          {/* Error Display */}
+          {error && (
+            <Alert className="border-destructive/50 bg-destructive/5">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 justify-center">
+            <Button variant="outline" size="sm" onClick={clearTranscript} disabled={!transcript}>
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+            <Button onClick={useTranscript} disabled={!transcript.trim()} className="gradient-button">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Use This Text
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Voice Examples */}
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle className="section-title">Voice Examples</CardTitle>
+          <CardDescription>Try saying these mathematical problems</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {mathExamples.map((example, index) => (
+              <div key={index} className="step-card">
+                <div className="flex items-center gap-3">
+                  <Waves className="h-4 w-4 text-primary flex-shrink-0" />
+                  <p className="text-sm italic">"{example}"</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+            <h4 className="text-sm font-semibold mb-2">Tips for better recognition:</h4>
+            <ul className="text-xs text-muted-foreground space-y-1">
+              <li>• Speak clearly and at a normal pace</li>
+              <li>• Use mathematical terms like "plus", "minus", "equals"</li>
+              <li>• Say "x squared" instead of "x²"</li>
+              <li>• Pause briefly between different parts of equations</li>
+              <li>• Ensure you're in a quiet environment</li>
             </ul>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

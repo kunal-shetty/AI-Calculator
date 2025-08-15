@@ -1,5 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
 
+const WOLFRAM_APP_ID = process.env.WOLFRAM_ALPHA_API_KEY
+
+interface WolframPod {
+  title: string
+  plaintext?: string
+  subpods?: Array<{
+    title?: string
+    plaintext?: string
+  }>
+}
+
+interface WolframResponse {
+  queryresult: {
+    success: boolean
+    error?: boolean
+    numpods?: number
+    pods?: WolframPod[]
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { query } = await request.json()
@@ -8,196 +28,114 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Query is required" }, { status: 400 })
     }
 
-    const apiKey = process.env.WOLFRAM_ALPHA_API_KEY
-    if (!apiKey) {
+    if (!WOLFRAM_APP_ID) {
       return NextResponse.json({ error: "Wolfram Alpha API key not configured" }, { status: 500 })
     }
 
-    console.log("Processing query:", query)
+    console.log("Querying Wolfram Alpha:", query)
 
-    // Use the Full Results API for better parsing
-    const url = `https://api.wolframalpha.com/v2/query?input=${encodeURIComponent(query)}&format=plaintext&output=JSON&appid=${apiKey}&includepodid=Result,Solution,DecimalApproximation,ExactResult,NumericResult&excludepodid=Input`
+    // Multiple fallback strategies
+    const strategies = [
+      // Strategy 1: Full query with step-by-step
+      `http://api.wolframalpha.com/v2/query?input=${encodeURIComponent(query)}&format=plaintext&output=JSON&appid=${WOLFRAM_APP_ID}&podstate=Step-by-step%20solution&includepodid=Solution,Result,StepByStepSolution,Input`,
 
-    console.log("Fetching from Wolfram Alpha...")
+      // Strategy 2: Simplified query
+      `http://api.wolframalpha.com/v2/query?input=${encodeURIComponent(query)}&format=plaintext&output=JSON&appid=${WOLFRAM_APP_ID}&includepodid=Solution,Result,Input`,
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "User-Agent": "Math Calculator App/1.0",
-      },
-      signal: AbortSignal.timeout(30000), // 30 second timeout
-    })
+      // Strategy 3: Basic query
+      `http://api.wolframalpha.com/v2/query?input=${encodeURIComponent(query)}&format=plaintext&output=JSON&appid=${WOLFRAM_APP_ID}`,
+    ]
 
-    if (!response.ok) {
-      console.error("Wolfram Alpha API error:", response.status, response.statusText)
-      return NextResponse.json(
-        { error: `Wolfram Alpha API error: ${response.status} ${response.statusText}` },
-        { status: response.status },
-      )
-    }
+    let lastError = null
 
-    const data = await response.json()
-    console.log("Raw Wolfram Alpha response:", JSON.stringify(data, null, 2))
+    for (const [index, url] of strategies.entries()) {
+      try {
+        console.log(`Trying strategy ${index + 1}:`, url)
 
-    if (!data.queryresult) {
-      return NextResponse.json({ error: "Invalid response from Wolfram Alpha" }, { status: 500 })
-    }
-
-    const queryResult = data.queryresult
-
-    if (!queryResult.success) {
-      const suggestions = queryResult.tips || queryResult.didyoumeans || []
-      return NextResponse.json(
-        {
-          error: "Wolfram Alpha could not interpret the query",
-          suggestions: suggestions.slice(0, 3),
-          queryresult: queryResult,
-        },
-        { status: 400 },
-      )
-    }
-
-    if (!queryResult.pods || queryResult.pods.length === 0) {
-      return NextResponse.json(
-        {
-          error: "No results found for this query",
-          queryresult: queryResult,
-        },
-        { status: 404 },
-      )
-    }
-
-    console.log(
-      "Available pods:",
-      queryResult.pods.map((pod: any) => ({ id: pod.id, title: pod.title })),
-    )
-
-    // Find the best result pod
-    let resultPod = null
-    let solutionText = ""
-    let steps: string[] = []
-    let assumptions: string[] = []
-    let warnings: string[] = []
-    const images: string[] = []
-
-    // Priority order for result pods
-    const resultPodIds = ["Result", "Solution", "DecimalApproximation", "ExactResult", "NumericResult"]
-
-    for (const podId of resultPodIds) {
-      resultPod = queryResult.pods.find((pod: any) => pod.id === podId)
-      if (resultPod) {
-        console.log(`Found result pod: ${podId}`)
-        break
-      }
-    }
-
-    // If no specific result pod found, look for pods with "result" or "solution" in title
-    if (!resultPod) {
-      resultPod = queryResult.pods.find(
-        (pod: any) =>
-          pod.title &&
-          (pod.title.toLowerCase().includes("result") ||
-            pod.title.toLowerCase().includes("solution") ||
-            pod.title.toLowerCase().includes("answer")),
-      )
-      if (resultPod) {
-        console.log(`Found result pod by title: ${resultPod.title}`)
-      }
-    }
-
-    // Extract solution text
-    if (resultPod && resultPod.subpods && resultPod.subpods.length > 0) {
-      const subpod = resultPod.subpods[0]
-      if (subpod.plaintext) {
-        solutionText = subpod.plaintext.trim()
-      } else if (subpod.img && subpod.img.src) {
-        images.push(subpod.img.src)
-        solutionText = subpod.img.alt || "See image result"
-      }
-    }
-
-    // Look for step-by-step solutions
-    const stepsPod = queryResult.pods.find(
-      (pod: any) =>
-        pod.id === "StepByStepSolution" ||
-        pod.title?.toLowerCase().includes("step") ||
-        pod.title?.toLowerCase().includes("solution"),
-    )
-
-    if (stepsPod && stepsPod.subpods) {
-      steps = stepsPod.subpods
-        .map((subpod: any) => subpod.plaintext)
-        .filter((text: string) => text && text.trim())
-        .map((text: string) => text.trim())
-    }
-
-    // Extract assumptions
-    if (queryResult.assumptions) {
-      assumptions = queryResult.assumptions.map(
-        (assumption: any) => assumption.text || assumption.desc || "Mathematical assumption applied",
-      )
-    }
-
-    // Extract warnings
-    if (queryResult.warnings) {
-      warnings = queryResult.warnings.map((warning: any) => warning.text || "Calculation warning")
-    }
-
-    // Collect all images
-    queryResult.pods.forEach((pod: any) => {
-      if (pod.subpods) {
-        pod.subpods.forEach((subpod: any) => {
-          if (subpod.img && subpod.img.src) {
-            images.push(subpod.img.src)
-          }
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "User-Agent": "MathCalculator/1.0",
+          },
+          timeout: 10000,
         })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const data: WolframResponse = await response.json()
+        console.log("Wolfram response:", JSON.stringify(data, null, 2))
+
+        if (data.queryresult?.success && data.queryresult?.pods) {
+          const pods = data.queryresult.pods
+
+          // Filter and process relevant pods
+          const relevantPods = pods.filter((pod) => {
+            const title = pod.title?.toLowerCase() || ""
+            return (
+              title.includes("result") ||
+              title.includes("solution") ||
+              title.includes("step") ||
+              title.includes("answer") ||
+              title.includes("decimal") ||
+              title.includes("exact")
+            )
+          })
+
+          if (relevantPods.length > 0) {
+            const result =
+              relevantPods[0]?.plaintext ||
+              relevantPods[0]?.subpods?.[0]?.plaintext ||
+              "Solution found but could not extract result"
+
+            const steps = relevantPods
+              .filter((pod) => pod.title?.toLowerCase().includes("step"))
+              .map((pod) => ({
+                step: pod.title || "Step",
+                explanation: pod.plaintext || pod.subpods?.[0]?.plaintext || "No explanation available",
+              }))
+
+            return NextResponse.json({
+              result,
+              steps: steps.length > 0 ? steps : undefined,
+              source: "wolfram",
+              strategy: index + 1,
+            })
+          }
+
+          // Fallback: use any available pod
+          const firstPod = pods.find((pod) => pod.plaintext || pod.subpods?.[0]?.plaintext)
+          if (firstPod) {
+            const result = firstPod.plaintext || firstPod.subpods?.[0]?.plaintext || "No result available"
+            return NextResponse.json({
+              result,
+              source: "wolfram",
+              strategy: index + 1,
+            })
+          }
+        }
+
+        lastError = new Error(
+          `Strategy ${index + 1} failed: ${data.queryresult?.success ? "No relevant pods found" : "Query unsuccessful"}`,
+        )
+      } catch (error) {
+        console.error(`Strategy ${index + 1} error:`, error)
+        lastError = error
+        continue
       }
-    })
-
-    // If no solution found, use the first available pod
-    if (!solutionText && queryResult.pods.length > 1) {
-      const firstResultPod = queryResult.pods[1] // Skip input pod
-      if (firstResultPod && firstResultPod.subpods && firstResultPod.subpods[0]) {
-        solutionText = firstResultPod.subpods[0].plaintext || "Result available in image"
-      }
     }
 
-    if (!solutionText) {
-      return NextResponse.json(
-        {
-          error: "Could not extract a readable solution from Wolfram Alpha",
-          queryresult: queryResult,
-        },
-        { status: 404 },
-      )
-    }
-
-    const result = {
-      input: query,
-      solution: solutionText,
-      steps: steps.length > 0 ? steps : undefined,
-      type: resultPod?.title || "Mathematical Result",
-      assumptions: assumptions.length > 0 ? assumptions : undefined,
-      warnings: warnings.length > 0 ? warnings : undefined,
-      images: images.length > 0 ? images.slice(0, 3) : undefined, // Limit to 3 images
-      success: true,
-      queryresult: queryResult,
-    }
-
-    console.log("Processed result:", result)
-    return NextResponse.json(result)
+    // All strategies failed
+    throw lastError || new Error("All Wolfram Alpha strategies failed")
   } catch (error) {
     console.error("Wolfram Alpha API error:", error)
-
-    if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        return NextResponse.json({ error: "Request timeout - Wolfram Alpha took too long to respond" }, { status: 408 })
-      }
-      if (error.message.includes("fetch")) {
-        return NextResponse.json({ error: "Network error - Could not connect to Wolfram Alpha" }, { status: 503 })
-      }
-    }
-
-    return NextResponse.json({ error: "Internal server error while processing your request" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to solve problem with Wolfram Alpha",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
   }
 }
