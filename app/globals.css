@@ -227,6 +227,217 @@
     --card: 50 40% 5%;
     --card-foreground: 50 60% 95%;
   }
+
+  /* 🌸 Pastel Pink Theme */
+.theme-pink {
+  --primary: 330 70% 80%;
+  --primary-foreground: 330 30% 15%;
+  --secondary: 330 60% 97%;
+  --secondary-foreground: 330 40% 25%;
+  --accent: 340 70% 95%;
+  --accent-foreground: 340 40% 20%;
+  --muted: 330 30% 96%;
+  --muted-foreground: 330 25% 45%;
+  --border: 330 30% 88%;
+  --input: 330 30% 94%;
+  --ring: 330 70% 80%;
+  --background: 330 60% 98%;
+  --foreground: 330 30% 20%;
+  --card: 330 70% 99%;
+  --card-foreground: 330 30% 20%;
+}
+.dark.theme-pink {
+  --primary: 330 65% 75%;
+  --primary-foreground: 330 25% 10%;
+  --secondary: 330 25% 15%;
+  --secondary-foreground: 330 40% 92%;
+  --accent: 340 30% 25%;
+  --accent-foreground: 340 40% 90%;
+  --muted: 330 20% 18%;
+  --muted-foreground: 330 20% 70%;
+  --border: 330 20% 25%;
+  --input: 330 20% 22%;
+  --background: 330 30% 12%;
+  --foreground: 330 30% 95%;
+  --card: 330 25% 15%;
+  --card-foreground: 330 30% 95%;
+}
+
+/* 🌊 Pastel Cyan Theme */
+.theme-cyan {
+  --primary: 190 70% 80%;
+  --primary-foreground: 190 40% 15%;
+  --secondary: 190 60% 97%;
+  --secondary-foreground: 190 40% 25%;
+  --accent: 185 70% 95%;
+  --accent-foreground: 185 40% 20%;
+  --muted: 190 30% 96%;
+  --muted-foreground: 190 25% 45%;
+  --border: 190 30% 88%;
+  --input: 190 30% 94%;
+  --ring: 190 70% 80%;
+  --background: 185 60% 98%;
+  --foreground: 190 30% 20%;
+  --card: 185 70% 99%;
+  --card-foreground: 190 30% 20%;
+}
+.dark.theme-cyan {
+  --primary: 190 65% 75%;
+  --primary-foreground: 190 25% 10%;
+  --secondary: 190 25% 15%;
+  --secondary-foreground: 190 40% 92%;
+  --accent: 185 30% 25%;
+  --accent-foreground: 185 40% 90%;
+  --muted: 190 20% 18%;
+  --muted-foreground: 190 20% 70%;
+  --border: 190 20% 25%;
+  --input: 190 20% 22%;
+  --background: 190 30% 12%;
+  --foreground: 190 30% 95%;
+  --card: 190 25% 15%;
+  --card-foreground: 190 30% 95%;
+}
+
+/* 🌿 Pastel Green Theme */
+.theme-green {
+  --primary: 140 60% 80%;
+  --primary-foreground: 140 30% 15%;
+  --secondary: 140 55% 97%;
+  --secondary-foreground: 140 40% 25%;
+  --accent: 145 65% 94%;
+  --accent-foreground: 145 40% 20%;
+  --muted: 140 30% 96%;
+  --muted-foreground: 140 25% 45%;
+  --border: 140 30% 88%;
+  --input: 140 30% 94%;
+  --ring: 140 60% 80%;
+  --background: 145 55% 98%;
+  --foreground: 140 30% 20%;
+  --card: 145 60% 99%;
+  --card-foreground: 140 30% 20%;
+}
+.dark.theme-green {
+  --primary: 140 55% 75%;
+  --primary-foreground: 140 25% 10%;
+  --secondary: 140 25% 15%;
+  --secondary-foreground: 140 40% 92%;
+  --accent: 145 30% 25%;
+  --accent-foreground: 145 40% 90%;
+  --muted: 140 20% 18%;
+  --muted-foreground: 140 20% 70%;
+  --border: 140 20% 25%;
+  --input: 140 20% 22%;
+  --background: 140 30% 12%;
+  --foreground: 140 30% 95%;
+  --card: 140 25% 15%;
+  --card-foreground: 140 30% 95%;
+}
+
+/* 🍋 Pastel Yellow Theme */
+.theme-yellow {
+  --primary: 50 90% 80%;
+  --primary-foreground: 50 40% 15%;
+  --secondary: 50 80% 97%;
+  --secondary-foreground: 50 40% 25%;
+  --accent: 55 85% 94%;
+  --accent-foreground: 55 40% 20%;
+  --muted: 50 30% 96%;
+  --muted-foreground: 50 25% 45%;
+  --border: 50 30% 88%;
+  --input: 50 30% 94%;
+  --ring: 50 90% 80%;
+  --background: 55 85% 97%;
+  --foreground: 50 30% 20%;
+  --card: 55 90% 99%;
+  --card-foreground: 50 30% 20%;
+}
+.dark.theme-yellow {
+  --primary: 50 85% 72%;
+  --primary-foreground: 50 30% 10%;
+  --secondary: 50 25% 15%;
+  --secondary-foreground: 50 40% 92%;
+  --accent: 55 30% 25%;
+  --accent-foreground: 55 40% 90%;
+  --muted: 50 20% 18%;
+  --muted-foreground: 50 20% 70%;
+  --border: 50 20% 25%;
+  --input: 50 20% 22%;
+  --background: 50 30% 12%;
+  --foreground: 50 30% 95%;
+  --card: 50 25% 15%;
+  --card-foreground: 50 30% 95%;
+}
+
+/* 💜 Pastel Purple Theme */
+.theme-purple {
+  --primary: 270 70% 85%;
+  --primary-foreground: 270 40% 15%;
+  --secondary: 270 60% 97%;
+  --secondary-foreground: 270 40% 25%;
+  --accent: 280 75% 95%;
+  --accent-foreground: 280 40% 20%;
+  --muted: 270 30% 96%;
+  --muted-foreground: 270 25% 45%;
+  --border: 270 30% 88%;
+  --input: 270 30% 94%;
+  --ring: 270 70% 85%;
+  --background: 280 70% 98%;
+  --foreground: 270 30% 20%;
+  --card: 280 70% 99%;
+  --card-foreground: 270 30% 20%;
+}
+.dark.theme-purple {
+  --primary: 270 65% 75%;
+  --primary-foreground: 270 30% 10%;
+  --secondary: 270 25% 15%;
+  --secondary-foreground: 270 40% 92%;
+  --accent: 280 30% 25%;
+  --accent-foreground: 280 40% 90%;
+  --muted: 270 20% 18%;
+  --muted-foreground: 270 20% 70%;
+  --border: 270 20% 25%;
+  --input: 270 20% 22%;
+  --background: 270 30% 12%;
+  --foreground: 270 30% 95%;
+  --card: 270 25% 15%;
+  --card-foreground: 270 30% 95%;
+}
+/* Cherry Blossom Theme */
+.theme-cherry {
+  --primary: 358 80% 72%;        /* pastel cherry red */
+  --primary-foreground: 0 100% 5%;
+  --secondary: 358 75% 96%;      /* super light cherry */
+  --secondary-foreground: 358 60% 20%;
+  --accent: 358 85% 92%;         /* gentle accent */
+  --accent-foreground: 358 65% 25%;
+  --muted: 358 35% 96%;
+  --muted-foreground: 358 25% 45%;
+  --border: 358 40% 90%;
+  --input: 358 35% 94%;
+  --ring: 358 80% 72%;
+  --background: 0 0% 100%;
+  --foreground: 358 70% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 358 70% 10%;
+}
+
+.dark.theme-cherry {
+  --primary: 358 70% 68%;        /* softer but rich cherry */
+  --primary-foreground: 0 100% 5%;
+  --secondary: 358 40% 12%;
+  --secondary-foreground: 358 65% 90%;
+  --accent: 358 35% 15%;
+  --accent-foreground: 358 70% 85%;
+  --muted: 358 30% 12%;
+  --muted-foreground: 358 20% 65%;
+  --border: 358 30% 20%;
+  --input: 358 30% 18%;
+  --background: 358 30% 5%;
+  --foreground: 358 70% 95%;
+  --card: 358 30% 7%;
+  --card-foreground: 358 70% 95%;
+}
+
 }
 
 @layer base {

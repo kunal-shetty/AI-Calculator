@@ -246,7 +246,7 @@ export default function MathCalculator() {
               </CardHeader>
               <CardContent>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-6">
+                  <TabsList className="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="text" className="flex items-center gap-2">
                       <BookOpen className="h-4 w-4" />
                       Text
@@ -255,10 +255,10 @@ export default function MathCalculator() {
                       <Mic className="h-4 w-4" />
                       Voice
                     </TabsTrigger>
-                    <TabsTrigger value="image" className="flex items-center gap-2">
+                    {/* <TabsTrigger value="image" className="flex items-center gap-2">
                       <Camera className="h-4 w-4" />
                       Image
-                    </TabsTrigger>
+                    </TabsTrigger> */}
                     <TabsTrigger value="builder" className="flex items-center gap-2">
                       <Settings className="h-4 w-4" />
                       Builder

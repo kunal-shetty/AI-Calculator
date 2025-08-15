@@ -60,6 +60,63 @@ const themes = [
       dark: { primary: "#fbbf24", secondary: "#1f1611", accent: "#2d1f17" },
     },
   },
+  {
+    name: "Strawberry Milk",
+    value: "theme-pink",
+    description: "Soft pink tones adding a calm, cozy vibe to equations",
+    colors: {
+      light: { primary: "#f9a8d4", secondary: "#fdf2f8", accent: "#fce7f3" },
+      dark: { primary: "#f472b6", secondary: "#2b1c23", accent: "#3b2a35" },
+    },
+  },
+{
+  name: "Cotton Candy Sky",
+  value: "theme-cyan",
+  description: "Gentle cyan hues bringing a fresh, breezy feeling to equations",
+  colors: {
+    light: { primary: "#7dd3fc", secondary: "#ecfeff", accent: "#cffafe" },
+    dark: { primary: "#38bdf8", secondary: "#16303a", accent: "#1e3a47" },
+  },
+},
+{
+  name: "Cherry Blossom",
+  value: "theme-cherry",
+  description: "Gentle cherry red tones with a soft, romantic pastel feel",
+  colors: {
+    light: { primary: "#f28b82", secondary: "#fdecea", accent: "#fad2d0" },
+    dark: { primary: "#e57373", secondary: "#2c1a1a", accent: "#3b2222" }
+  },
+},
+
+{
+  name: "Mint Mojito",
+  value: "theme-green",
+  description: "Light green shades adding a natural and soothing vibe",
+  colors: {
+    light: { primary: "#86efac", secondary: "#f0fdf4", accent: "#dcfce7" },
+    dark: { primary: "#4ade80", secondary: "#1b2e1f", accent: "#233727" },
+  },
+},
+{
+  name: "Sunflower Fields",
+  value: "theme-yellow",
+  description: "Cheerful pastel yellows bringing brightness and positivity",
+  colors: {
+    light: { primary: "#fde68a", secondary: "#fffbeb", accent: "#fef9c3" },
+    dark: { primary: "#facc15", secondary: "#332f1a", accent: "#423b21" },
+  },
+},
+{
+  name: "Lavender Dreams",
+  value: "theme-purple",
+  description: "Dreamy lavender tones adding a calm, magical touch",
+  colors: {
+    light: { primary: "#d8b4fe", secondary: "#faf5ff", accent: "#f3e8ff" },
+    dark: { primary: "#a855f7", secondary: "#2b1f38", accent: "#3a2947" },
+  },
+},
+
+  
 ]
 
 interface ColorCustomizerProps {
