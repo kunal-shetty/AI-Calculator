@@ -86,7 +86,7 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
 
   const advanced = [
     { label: "(", value: "(", icon: Parentheses },
-    { label: ")", value: ")" },
+    { label: ")", value: ")", icon: Parentheses },
     { label: "x²", value: "²" },
     { label: "x³", value: "³" },
     { label: "^", value: "^" },
@@ -109,7 +109,7 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
       {/* Equation Display */}
       <Card className="glass-card">
         <CardHeader className="pb-3">
-          <CardTitle className="section-title flex items-center gap-2 text-base sm:text-lg">
+          <CardTitle className="section-title flex items-center gap-2 text-sm sm:text-base">
             <Calculator className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Equation Builder
           </CardTitle>
