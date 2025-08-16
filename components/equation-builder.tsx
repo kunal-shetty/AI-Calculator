@@ -115,7 +115,7 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">Build mathematical expressions visually</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-0 px-1 space-y-4">
           <div className="result-showcase min-h-[60px] sm:min-h-[80px] flex items-center justify-center p-2 sm:p-4">
             <div className="math-display text-center text-lg sm:text-1xl break-all">
               {equation || "Build your equation..."}
