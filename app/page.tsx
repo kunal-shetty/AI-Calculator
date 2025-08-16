@@ -206,7 +206,7 @@ export default function MathCalculator() {
                 <Calculator className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-title font-bold">SolveAI</h1>
+                <h1 className="text-title font-bold">SolvAI</h1>
                 <p className="text-caption">Your smartest way to solve math</p>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function MathCalculator() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Input Section */}
           <div className="lg:col-span-2 space-y-6">
@@ -482,13 +482,13 @@ export default function MathCalculator() {
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between sm:gap-4">
               <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-2">
                 <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                  SolveAI
+                  SolvAI
                 </span>
                 <span className="hidden sm:inline text-muted-foreground">•</span>
                 <span className="text-xs sm:text-sm text-muted-foreground text-center">Advanced Math Solver</span>
               </div>
               <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                <span>© 2025 SolveAI</span>
+                <span>© 2025 SolvAI</span>
                 <span className="hidden sm:inline">•</span>
                 <span className="text-center">Powered by Artificial Intelligence</span>
               </div>
