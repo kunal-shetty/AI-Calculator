@@ -84,6 +84,23 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
     { label: "√", value: "√(" },
   ]
 
+  const variables = [
+    
+    { label: "a", value: "a" },
+    { label: "b", value: "b" },
+    { label: "c", value: "c" },
+    { label: "d", value: "d" },
+    
+    { label: "α", value: "α" },
+    { label: "β", value: "β" },
+    { label: "γ", value: "γ" },
+    { label: "θ", value: "θ" },
+    { label: "t", value: "t" },
+    { label: "x", value: "x" },
+    { label: "y", value: "y" },
+    { label: "z", value: "z" },
+  ]
+
   const advanced = [
     { label: "(", value: "(", icon: Parentheses },
     { label: ")", value: ")", icon: Parentheses },
@@ -256,6 +273,27 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
               ))}
             </div>
           </CardContent>
+        </Card>
+
+        <Card className="glass-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="section-title text-sm">Quick Variables</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1 sm:gap-2">
+              {variables.map((variable) => (
+                <Button
+                  key={variable.label}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addToEquation(variable.value)}
+                  className="h-8 sm:h-10 text-xs font-semibold hover:bg-primary/10 hover:border-primary/30 transition-colors"
+                >
+                  {variable.label}
+                </Button>
+              ))}
+            </div>
+            </CardContent>
         </Card>
 
         {/* History */}
