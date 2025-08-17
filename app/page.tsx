@@ -427,7 +427,7 @@ export default function MathCalculator() {
     <div key={index} className="flex items-center gap-2 text-xs">
       <div className="w-2 h-2 bg-green-500 rounded-full" />
       <span className="flex-1 truncate overflow-hidden whitespace-nowrap">
-        {item.input}
+        {item.input.slice(0, 20)}
       </span>
       <span className="text-muted-foreground">
         {item.timestamp.toLocaleTimeString([], {
