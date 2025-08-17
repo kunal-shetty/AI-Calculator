@@ -171,17 +171,17 @@ export function VoiceInput({ onResult }: VoiceInputProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Voice Control */}
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="section-title flex items-center gap-2">
-            <Mic className="h-5 w-5 text-primary" />
+            <Mic className="h-4 w-4 text-primary" />
             Voice Input
           </CardTitle>
           <CardDescription>Speak your mathematical problem naturally</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {/* Microphone Visualization */}
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
