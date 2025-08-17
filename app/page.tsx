@@ -422,22 +422,22 @@ export default function MathCalculator() {
                 </div>
                 <Separator />
                 <div className="space-y-2">
-  <p className="text-caption">Recent Activity</p>
-  {history.slice(0, 3).map((item, index) => (
-    <div key={index} className="flex items-center gap-2 text-xs">
-      <div className="w-2 h-2 bg-green-500 rounded-full" />
-      <span className="flex-1 truncate overflow-hidden whitespace-nowrap">
-        {item.input.slice(0, 20)}
-      </span>
-      <span className="text-muted-foreground">
-        {item.timestamp.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </span>
-    </div>
-  ))}
-</div>
+                  <p className="text-caption">Recent Activity</p>
+                  {history.slice(0, 3).map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs">
+                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+                      <span className="flex-1 truncate overflow-hidden whitespace-nowrap">
+                        {item.input.slice(0, 45)}{item.input.length > 45 ? "..." : ""}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {item.timestamp.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
 
               </CardContent>
             </Card>
