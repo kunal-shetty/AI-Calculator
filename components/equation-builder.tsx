@@ -85,12 +85,10 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
   ]
 
   const variables = [
-    
     { label: "a", value: "a" },
     { label: "b", value: "b" },
     { label: "c", value: "c" },
     { label: "d", value: "d" },
-    
     { label: "α", value: "α" },
     { label: "β", value: "β" },
     { label: "γ", value: "γ" },
@@ -132,9 +130,9 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">Build mathematical expressions visually</CardDescription>
         </CardHeader>
-        <CardContent className="pt-0 px-1 space-y-4">
-          <div className="result-showcase min-h-[60px] sm:min-h-[80px] flex items-center justify-center p-2 sm:p-4">
-            <div className="math-display text-center text-lg sm:text-1xl break-all">
+        <CardContent className="space-y-4">
+          <div className="result-showcase min-h-[60px] sm:min-h-[80px] flex items-center justify-center p-3 sm:p-4">
+            <div className="math-display text-center text-base sm:text-xl break-words w-full">
               {equation || "Build your equation..."}
             </div>
           </div>
@@ -181,7 +179,7 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
                 key={index}
                 variant="outline"
                 size="sm"
-                onClick={() => useTemplate(eq.template)}
+                onClick={() => addToEquation(eq.template)}
                 className="text-xs h-auto py-2 px-2 sm:px-3 hover:bg-primary/10 hover:border-primary/30 transition-colors"
               >
                 <div className="text-center w-full">
@@ -293,7 +291,7 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
                 </Button>
               ))}
             </div>
-            </CardContent>
+          </CardContent>
         </Card>
 
         {/* History */}

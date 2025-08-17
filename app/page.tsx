@@ -229,8 +229,8 @@ export default function MathCalculator() {
         </div>
       </header>
 
-      <div className="container mx-auto px-2 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Input Section */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="glass-card fade-in-up">
@@ -254,10 +254,6 @@ export default function MathCalculator() {
                       <Mic className="h-4 w-4" />
                       Voice
                     </TabsTrigger>
-                    {/* <TabsTrigger value="image" className="flex items-center gap-2">
-                      <Camera className="h-4 w-4" />
-                      Image
-                    </TabsTrigger> */}
                     <TabsTrigger value="builder" className="flex items-center gap-2">
                       <Settings className="h-4 w-4" />
                       Builder
@@ -476,6 +472,7 @@ export default function MathCalculator() {
             </Card>
           </div>
         </div>
+
         {/* Footer */}
         <footer className="mt-12 sm:mt-16 border-t border-border/50 bg-card/30 backdrop-blur-sm">
           <div className="container mx-auto px-4 py-4 sm:py-6">
