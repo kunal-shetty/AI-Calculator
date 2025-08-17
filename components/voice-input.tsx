@@ -171,130 +171,134 @@ export function VoiceInput({ onResult }: VoiceInputProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Voice Control */}
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="section-title flex items-center gap-2">
-            <Mic className="h-4 w-4 text-primary" />
-            Voice Input
-          </CardTitle>
-          <CardDescription>Speak your mathematical problem naturally</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Microphone Visualization */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <Button
-                size="lg"
-                onClick={isListening ? stopListening : startListening}
-                className={`w-20 h-20 rounded-full transition-all duration-300 ${
-                  isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : "gradient-button"
-                }`}
-              >
-                {isListening ? <Square className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
-              </Button>
+    <div className="space-y-4 overflow-x-hidden">
+  {/* Voice Control */}
+  <Card className="glass-card">
+    <CardHeader>
+      <CardTitle className="section-title flex items-center gap-2">
+        <Mic className="h-4 w-4 text-primary" />
+        Voice Input
+      </CardTitle>
+      <CardDescription>Speak your mathematical problem naturally</CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      {/* Microphone Visualization */}
+      <div className="flex flex-col items-center space-y-4">
+        <div className="relative w-24 h-24">
+          <Button
+            size="lg"
+            onClick={isListening ? stopListening : startListening}
+            className={`w-full h-full rounded-full transition-all duration-300 ${
+              isListening ? "bg-red-500 hover:bg-red-600 animate-pulse" : "gradient-button"
+            }`}
+          >
+            {isListening ? <Square className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
+          </Button>
 
-              {/* Audio Level Visualization */}
-              {isListening && (
-                <div
-                  className="absolute inset-0 rounded-full border-4 border-red-500/30 animate-ping"
-                  style={{
-                    transform: `scale(${1 + audioLevel / 100})`,
-                    opacity: Math.max(0.3, audioLevel / 255),
-                  }}
-                />
+          {/* Audio Ping */}
+          {isListening && (
+            <div
+              className="absolute inset-0 rounded-full border-4 border-red-500/30 animate-ping"
+              style={{
+                transform: `scale(${1 + audioLevel / 200})`,
+                opacity: Math.max(0.3, audioLevel / 255),
+              }}
+            />
+          )}
+        </div>
+
+        {/* Status Text */}
+        <div className="text-center">
+          <p className="text-sm font-medium">{isListening ? "Listening..." : "Click to start speaking"}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {isListening ? "Speak clearly and naturally" : "Make sure your microphone is enabled"}
+          </p>
+        </div>
+
+        {/* Audio Level Bar */}
+        {isListening && (
+          <div className="w-full max-w-xs">
+            <div className="flex items-center gap-2 mb-2">
+              <Volume2 className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">Audio Level</span>
+            </div>
+            <Progress value={audioLevel} className="h-2" />
+          </div>
+        )}
+      </div>
+
+      {/* Transcript Display */}
+      {transcript && (
+        <div className="result-showcase">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="section-title">Transcript</h3>
+              {confidence > 0 && (
+                <Badge
+                  variant={confidence > 80 ? "default" : confidence > 60 ? "secondary" : "destructive"}
+                >
+                  {Math.round(confidence)}% confidence
+                </Badge>
               )}
             </div>
+            <p className="text-lg font-mono break-words">{transcript}</p>
+          </div>
+        </div>
+      )}
 
-            <div className="text-center">
-              <p className="text-sm font-medium">{isListening ? "Listening..." : "Click to start speaking"}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {isListening ? "Speak clearly and naturally" : "Make sure your microphone is enabled"}
-              </p>
+      {/* Error Display */}
+      {error && (
+        <Alert className="border-destructive/50 bg-destructive/5">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-2 justify-center flex-wrap">
+        <Button variant="outline" size="sm" onClick={clearTranscript} disabled={!transcript}>
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Clear
+        </Button>
+        <Button onClick={useTranscript} disabled={!transcript?.trim()} className="gradient-button">
+          <CheckCircle className="h-4 w-4 mr-2" />
+          Use This Text
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+
+  {/* Voice Examples */}
+  <Card className="glass-card">
+    <CardHeader>
+      <CardTitle className="section-title">Voice Examples</CardTitle>
+      <CardDescription>Try saying these mathematical problems</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-3">
+        {mathExamples.map((example, index) => (
+          <div key={index} className="step-card">
+            <div className="flex items-center gap-3">
+              <Waves className="h-4 w-4 text-primary flex-shrink-0" />
+              <p className="text-sm italic break-words">"{example}"</p>
             </div>
-
-            {/* Audio Level Indicator */}
-            {isListening && (
-              <div className="w-full max-w-xs">
-                <div className="flex items-center gap-2 mb-2">
-                  <Volume2 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">Audio Level</span>
-                </div>
-                <Progress value={audioLevel} className="h-2" />
-              </div>
-            )}
           </div>
+        ))}
+      </div>
 
-          {/* Transcript Display */}
-          {transcript && (
-            <div className="result-showcase">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="section-title">Transcript</h3>
-                  {confidence > 0 && (
-                    <Badge variant={confidence > 80 ? "default" : confidence > 60 ? "secondary" : "destructive"}>
-                      {Math.round(confidence)}% confidence
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-lg font-mono">{transcript}</p>
-              </div>
-            </div>
-          )}
+      <div className="mt-4 p-4 bg-muted/30 rounded-lg text-xs text-muted-foreground">
+        <h4 className="font-semibold mb-2">Tips for better recognition:</h4>
+        <ul className="space-y-1 list-disc list-inside">
+          <li>Speak clearly and at a normal pace</li>
+          <li>Use mathematical terms like "plus", "minus", "equals"</li>
+          <li>Say "x squared" instead of "x²"</li>
+          <li>Pause briefly between different parts of equations</li>
+          <li>Ensure you're in a quiet environment</li>
+        </ul>
+      </div>
+    </CardContent>
+  </Card>
+</div>
 
-          {/* Error Display */}
-          {error && (
-            <Alert className="border-destructive/50 bg-destructive/5">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-2 justify-center">
-            <Button variant="outline" size="sm" onClick={clearTranscript} disabled={!transcript}>
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Clear
-            </Button>
-            <Button onClick={useTranscript} disabled={!transcript.trim()} className="gradient-button">
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Use This Text
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Voice Examples */}
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="section-title">Voice Examples</CardTitle>
-          <CardDescription>Try saying these mathematical problems</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {mathExamples.map((example, index) => (
-              <div key={index} className="step-card">
-                <div className="flex items-center gap-3">
-                  <Waves className="h-4 w-4 text-primary flex-shrink-0" />
-                  <p className="text-sm italic">"{example}"</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-            <h4 className="text-sm font-semibold mb-2">Tips for better recognition:</h4>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• Speak clearly and at a normal pace</li>
-              <li>• Use mathematical terms like "plus", "minus", "equals"</li>
-              <li>• Say "x squared" instead of "x²"</li>
-              <li>• Pause briefly between different parts of equations</li>
-              <li>• Ensure you're in a quiet environment</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
   )
 }
