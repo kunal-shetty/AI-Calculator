@@ -113,9 +113,8 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
   { name: "Linear", template: "x + y = z" },
   { name: "Quadratic", template: "ax² + bx + c = 0" },
   { name: "Cubic", template: "ax³ + bx² + cx + d = 0" },
-  { name: "Differentiation", template: "d/dx f(x)" },
-  { name: "Integration", template: "∫ f(x) dx" },
-  { name: "Double Integration", template: "∫∫ f(x,y) dx dy" }
+  { name: "Differentiation", template: "d/dx (xⁿ) = n·xⁿ⁻¹" },
+  { name: "Integration", template: "∫xⁿ dx = xⁿ⁺¹/(n+1) + C" }
 ];
 
 
