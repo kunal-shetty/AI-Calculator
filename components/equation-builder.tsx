@@ -107,17 +107,17 @@ export function EquationBuilder({ onResult }: EquationBuilderProps) {
     { label: "^", value: "^" },
     { label: "π", value: "π", icon: Pi },
     { label: "∞", value: "∞", icon: Infinity },
-    { label: "y", value: "y" },
   ]
 
   const commonEquations = [
-    { name: "Quadratic", template: "ax² + bx + c = 0" },
-    { name: "Linear", template: "mx + b = y" },
-    { name: "Circle", template: "(x-h)² + (y-k)² = r²" },
-    { name: "Pythagorean", template: "a² + b² = c²" },
-    { name: "Slope", template: "m = (y₂-y₁)/(x₂-x₁)" },
-    { name: "Distance", template: "d = √((x₂-x₁)² + (y₂-y₁)²)" },
-  ]
+  { name: "Linear", template: "x + y = z" },
+  { name: "Quadratic", template: "ax² + bx + c = 0" },
+  { name: "Cubic", template: "ax³ + bx² + cx + d = 0" },
+  { name: "Differentiation", template: "d/dx f(x)" },
+  { name: "Integration", template: "∫ f(x) dx" },
+  { name: "Double Integration", template: "∫∫ f(x,y) dx dy" }
+];
+
 
   return (
     <div className="space-y-4 sm:space-y-6">

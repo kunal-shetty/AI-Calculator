@@ -314,7 +314,8 @@ export default function MathCalculator() {
                   </TabsContent>
 
                   <TabsContent value="builder">
-                    <EquationBuilder onResult={handleEquationResult} />
+                    <EquationBuilder 
+                    onResult={handleEquationResult} />
                   </TabsContent>
                 </Tabs>
 
@@ -490,7 +491,7 @@ export default function MathCalculator() {
               <div className="flex flex-col items-center gap-1 sm:flex-row sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                 <span>© 2025 SolvAI</span>
                 <span className="hidden sm:inline">•</span>
-                <span className="text-center">Powered by Artificial Intelligence</span>
+                <span className="text-center">Built with ❤️ by <a href="https://github.com/kunal-shetty">Kunal</a></span>
               </div>
             </div>
           </div>
